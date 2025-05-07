@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.saji.m2.commons</groupId>
+    <artifactId>clean-architecture-commons</artifactId>
+    <version>1.0.0</version>
+    <parent>
+        <groupId>com.saji.m2.parent</groupId>
+        <artifactId>m2-commons-parent</artifactId>
+        <version>0.0.1</version>
+    </parent>
+    <properties>
+        <!-- https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api -->
+        <jakarta.persistence.version>3.2.0</jakarta.persistence.version>
+    </properties>
+    <dependencies>
+
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <version>${jakarta.persistence.version}</version>
+        </dependency>
+    </dependencies>
+<!--    <profiles>-->
+<!--        <profile>-->
+<!--            <id>default-tools.jar</id>-->
+<!--            <activation>-->
+<!--                <property>-->
+<!--                    <name>java.vendor</name>-->
+<!--                    <value>Oracle Corporation</value>-->
+<!--                </property>-->
+<!--            </activation>-->
+<!--            <dependencies>-->
+<!--                <dependency>-->
+<!--                    <groupId>com.sun</groupId>-->
+<!--                    <artifactId>tools</artifactId>-->
+<!--                    <version>1.5.0</version>-->
+<!--                    <scope>system</scope>-->
+<!--                    <systemPath>${java.home}/../lib/tools.jar</systemPath>-->
+<!--                </dependency>-->
+<!--            </dependencies>-->
+<!--        </profile>-->
+<!--    </profiles>-->
+</project>
