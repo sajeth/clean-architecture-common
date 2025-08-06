@@ -1,18 +1,15 @@
 package com.saji.infrastructre.adapter.secondary.logging;
 
-import com.saji.application.port.output.logger.LoggerOutputPort;
+import com.saji.application.port.output.LoggerOutputPort;
 
 import java.util.logging.Logger;
 
 public abstract class LoggerAdapter implements LoggerOutputPort {
 
-    private final Class<?> clazz;
-
     private final Logger logger;
 
     public LoggerAdapter(Class<?> clazz) {
-        this.clazz = clazz;
-        logger=Logger.getLogger(clazz.getClass().getName());
+        this.logger = Logger.getLogger(clazz.getName()); // Fixed the logger initialization
     }
 
     @Override
@@ -37,6 +34,6 @@ public abstract class LoggerAdapter implements LoggerOutputPort {
 
     @Override
     public void error(String message, Throwable throwable) {
-        logger.throwing(message,clazz.getClass().getName(),throwable);
+        logger.throwing(message,this.logger.getResourceBundleName(),throwable);
     }
 }
