@@ -4,7 +4,8 @@ import com.saji.infrastructre.adapter.secondary.persistence.cqrs.command.CreateC
 import com.saji.infrastructre.adapter.secondary.persistence.cqrs.command.UpdateCommand;
 
 public interface BaseAggregate<T> {
-    public T handleCreateCommand(CreateCommand<T> command);
-    public T handleUpdateCommand(UpdateCommand<T> command);
+    T handleCreateCommand(CreateCommand<T> command);
+
+    T handleUpdateCommand(UpdateCommand<T> command);
 
 }

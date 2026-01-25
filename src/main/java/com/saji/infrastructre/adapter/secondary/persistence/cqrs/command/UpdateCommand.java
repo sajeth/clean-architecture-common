@@ -10,6 +10,6 @@ import lombok.*;
 @Getter
 @MappedSuperclass
 public class UpdateCommand<T> {
-    private int id;
+    private T id;
     private String modifiedBy;
 }

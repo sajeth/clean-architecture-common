@@ -34,6 +34,6 @@ public abstract class LoggerAdapter implements LoggerOutputPort {
 
     @Override
     public void error(String message, Throwable throwable) {
-        logger.throwing(message,this.logger.getResourceBundleName(),throwable);
+        logger.throwing(message, this.logger.getResourceBundleName(), throwable);
     }
 }
