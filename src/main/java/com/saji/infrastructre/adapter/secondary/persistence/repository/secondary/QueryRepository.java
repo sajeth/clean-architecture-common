@@ -8,6 +8,6 @@ import org.springframework.data.repository.reactive.ReactiveSortingRepository;
 /**
  * @author sajethperli
  */
-public interface QueryRepository<T, ID> extends ReactiveSortingRepository<T,ID>,ReactiveCrudRepository<T, ID>, ReactiveQueryByExampleExecutor<T> {
+public interface QueryRepository<T, ID> extends ReactiveSortingRepository<T, ID>, ReactiveCrudRepository<T, ID>, ReactiveQueryByExampleExecutor<T> {
 }
 

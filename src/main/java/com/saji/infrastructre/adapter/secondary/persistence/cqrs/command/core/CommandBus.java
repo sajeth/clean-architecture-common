@@ -1,10 +1,10 @@
 package com.saji.infrastructre.adapter.secondary.persistence.cqrs.command.core;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.saji.infrastructre.adapter.secondary.logging.LoggerAdapter;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,44 +14,44 @@ import java.util.Map;
  * Implements the mediator pattern for command processing.
  */
 @Component
-public class CommandBus {
+public class CommandBus extends LoggerAdapter {
 
-    private static final Logger log = LoggerFactory.getLogger(CommandBus.class);
     private final Map<Class<?>, CommandHandler<?, ?>> handlers = new HashMap<>();
 
     public CommandBus(List<CommandHandler<?, ?>> commandHandlers) {
+        super(CommandBus.class);
         commandHandlers.forEach(handler -> {
             handlers.put(handler.getCommandType(), handler);
-            log.debug("Registered command handler: {} for {}",
-                handler.getClass().getSimpleName(),
-                handler.getCommandType().getSimpleName());
+            debug(MessageFormat.format("Registered command handler: {0} for {1}",
+                    handler.getClass().getSimpleName(),
+                    handler.getCommandType().getSimpleName()));
         });
-        log.info("CommandBus initialized with {} handlers", handlers.size());
+        info(MessageFormat.format("CommandBus initialized with {0} handlers", handlers.size()));
     }
 
     /**
      * Dispatch a command to its handler.
      *
      * @param command The command to dispatch
-     * @param <R> The result type
+     * @param <R>     The result type
      * @return A Mono containing the result of command execution
      */
     @SuppressWarnings("unchecked")
     public <R> Mono<R> dispatch(Command<R> command) {
         CommandHandler<Command<R>, R> handler =
-            (CommandHandler<Command<R>, R>) handlers.get(command.getClass());
+                (CommandHandler<Command<R>, R>) handlers.get(command.getClass());
 
         if (handler == null) {
             return Mono.error(new IllegalArgumentException(
-                "No handler registered for command: " + command.getClass().getSimpleName()));
+                    "No handler registered for command: " + command.getClass().getSimpleName()));
         }
 
-        log.debug("Dispatching command: {}", command.getClass().getSimpleName());
+        debug(MessageFormat.format("Dispatching command: {0}", command.getClass().getSimpleName()));
         return handler.handle(command)
-            .doOnSuccess(result -> log.debug("Command {} completed successfully",
-                command.getClass().getSimpleName()))
-            .doOnError(error -> log.error("Command {} failed: {}",
-                command.getClass().getSimpleName(), error.getMessage()));
+                .doOnSuccess(result -> debug(MessageFormat.format("Command {0} completed successfully",
+                        command.getClass().getSimpleName())))
+                .doOnError(error -> error(MessageFormat.format("Command {0} failed: {1}",
+                        command.getClass().getSimpleName(), error.getMessage())));
     }
 
     /**

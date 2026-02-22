@@ -31,7 +31,7 @@ public abstract class BaseEntity {
 
     @LastModifiedBy
     @Column("modified_by")
-    private UUID modifiedBy;
+    private String modifiedBy;
 
     @LastModifiedDate
     @Column("modified_date")
@@ -39,7 +39,7 @@ public abstract class BaseEntity {
 
     @CreatedBy
     @Column("created_by")
-    private UUID createdBy;
+    private String createdBy;
 
     @CreatedDate
     @Column("created_date")
@@ -48,6 +48,7 @@ public abstract class BaseEntity {
 
     /**
      * Generates a URL-friendly slug based on the entity's name.
+     *
      * @return a lowercase, hyphen-separated string with special characters removed
      */
     public String generateSlug() {

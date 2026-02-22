@@ -1,13 +1,13 @@
 package com.saji.infrastructre.adapter.secondary.persistence.cqrs.query.core;
+
 import reactor.core.publisher.Mono;
 
 /**
+ * @param <Q> The type of query to handle
+ * @param <R> The type of result returned
  * @author sajethperli
  * Handler interface for processing queries in a reactive manner.
  * Each query type should have exactly one handler.
- *
- * @param <Q> The type of query to handle
- * @param <R> The type of result returned
  */
 public interface QueryHandler<Q extends Query<R>, R> {
 
