@@ -1,4 +1,4 @@
-package com.saji.application.dto;
+package com.saji.presentation.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
