@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
  * @author sajethperli
  */
 @ControllerAdvice
-public class GlobalControllerExceptionHandler {
+public class ControllerExceptionHandler {
     @ExceptionHandler(ConversionFailedException.class)
     public ResponseEntity<String> handleConflict(RuntimeException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
