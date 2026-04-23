@@ -11,14 +11,6 @@
         <version>0.0.1</version>
     </parent>
     <properties>
-        <!-- https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api -->
-        <jakarta.persistence.version>3.2.0</jakarta.persistence.version>
-        <!-- Source: https://mvnrepository.com/artifact/org.springframework.data/spring-data-relational -->
-        <spring.data.relational>4.0.2</spring.data.relational>
-        <!-- Source: https://mvnrepository.com/artifact/org.springframework.data/spring-data-jpa -->
-        <spring.data.jpa>4.0.2</spring.data.jpa>
-        <!-- Source: https://mvnrepository.com/artifact/io.projectreactor/reactor-core -->
-        <reactor.core>3.8.2</reactor.core>
     </properties>
     <dependencies>
         <dependency>
