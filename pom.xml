@@ -10,6 +10,13 @@
         <artifactId>m2-commons-parent</artifactId>
         <version>0.0.1</version>
     </parent>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/sajeth/clean-architecture-common</url>
+        </repository>
+    </distributionManagement>
+
     <properties>
     </properties>
     <dependencies>
