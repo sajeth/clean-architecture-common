@@ -8,7 +8,7 @@
     <parent>
         <groupId>com.saji.m2.parent</groupId>
         <artifactId>m2-commons-parent</artifactId>
-        <version>{"message":"Resource not accessible by integration","documentation_url":"https://docs.github.com/rest/packages/packages#list-package-versions-for-a-package-owned-by-a-user","status":"403"}</version>
+        <version>0.0.1</version>
     </parent>
     <distributionManagement>
         <repository>
