@@ -25,27 +25,28 @@ jobs:
 
       - name: Resolve latest parent version
         run: |
-          PACKAGE_NAME=$(gh api "/users/sajeth/packages?package_type=maven&per_page=100" \
-            --jq '[.[] | select(.name | ascii_downcase | contains("m2-commons-parent"))] | .[0].name' \
-            2>/dev/null || echo "")
+          METADATA_URL="https://maven.pkg.github.com/sajeth/m2-java-parent/com/saji/m2/parent/m2-commons-parent/maven-metadata.xml"
+          METADATA=$(curl -sf -u "x:$GITHUB_TOKEN" "$METADATA_URL" || echo "")
 
-          if [ -z "$PACKAGE_NAME" ] || [ "$PACKAGE_NAME" = "null" ]; then
-            echo "::error::Could not find m2-commons-parent in sajeth's GitHub Packages. Ensure it has been published from the m2-java-parent repo."
+          if [ -z "$METADATA" ]; then
+            echo "::error::Could not fetch $METADATA_URL — ensure m2-commons-parent is published from m2-java-parent and the token has read:packages scope."
             exit 1
           fi
 
-          LATEST_PARENT=$(gh api "/users/sajeth/packages/maven/${PACKAGE_NAME}/versions" \
-            --jq '.[0].name' 2>/dev/null || echo "")
+          LATEST_PARENT=$(echo "$METADATA" | grep -oP '(?<=<release>)[^<]+' | head -1)
+          if [ -z "$LATEST_PARENT" ]; then
+            LATEST_PARENT=$(echo "$METADATA" | grep -oP '(?<=<latest>)[^<]+' | head -1)
+          fi
 
-          if [ -z "$LATEST_PARENT" ] || [ "$LATEST_PARENT" = "null" ]; then
-            echo "::error::Found package ${PACKAGE_NAME} but could not retrieve its versions."
+          if [ -z "$LATEST_PARENT" ]; then
+            echo "::error::Fetched maven-metadata.xml but could not parse a version from it."
             exit 1
           fi
 
           echo "Resolved latest m2-commons-parent: $LATEST_PARENT"
           echo "LATEST_PARENT=$LATEST_PARENT" >> "$GITHUB_ENV"
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update parent version and bump project version
         run: python3 .github/scripts/update_pom.py "$LATEST_PARENT"
