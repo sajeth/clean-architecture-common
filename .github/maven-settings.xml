@@ -6,7 +6,7 @@
         <server>
             <id>github</id>
             <username>sajeth</username>
-            <password>${env.PACKAGES_TOKEN}</password>
+            <password>${env.GH_PACKAGES_TOKEN}</password>
         </server>
     </servers>
     <profiles>

@@ -30,10 +30,10 @@ jobs:
       - name: Resolve latest parent version
         run: |
           METADATA_URL="https://maven.pkg.github.com/sajeth/m2-java-parent/com/saji/m2/parent/m2-commons-parent/maven-metadata.xml"
-          METADATA=$(curl -sf -u "sajeth:$PACKAGES_TOKEN" "$METADATA_URL" || echo "")
+          METADATA=$(curl -sf -u "sajeth:$GH_PACKAGES_TOKEN" "$METADATA_URL" || echo "")
 
           if [ -z "$METADATA" ]; then
-            echo "::error::Could not fetch $METADATA_URL — ensure m2-commons-parent is published from m2-java-parent and PACKAGES_TOKEN secret has read:packages scope."
+            echo "::error::Could not fetch $METADATA_URL — ensure m2-commons-parent is published from m2-java-parent and GH_PACKAGES_TOKEN secret has read:packages scope."
             exit 1
           fi
 
@@ -50,7 +50,7 @@ jobs:
           echo "Resolved latest m2-commons-parent: $LATEST_PARENT"
           echo "LATEST_PARENT=$LATEST_PARENT" >> "$GITHUB_ENV"
         env:
-          PACKAGES_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
+          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
 
       - name: Update parent version and bump project version
         run: python3 .github/scripts/update_pom.py "$LATEST_PARENT"
@@ -66,4 +66,4 @@ jobs:
       - name: Deploy to GitHub Packages
         run: mvn --no-transfer-progress deploy -DskipTests --settings .github/maven-settings.xml
         env:
-          PACKAGES_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
+          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
