@@ -4,19 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.saji.m2.commons</groupId>
     <artifactId>clean-architecture-common</artifactId>
-    <version>1.0.1</version>
+    <version>0.0.7</version>
     <parent>
         <groupId>com.saji.m2.parent</groupId>
         <artifactId>m2-commons-parent</artifactId>
         <version>0.0.1</version>
     </parent>
-    <repositories>
-        <repository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/sajeth/m2-java-parent</url>
-        </repository>
-    </repositories>
-
     <properties>
     </properties>
     <dependencies>
