@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.saji.m2.commons</groupId>
     <artifactId>clean-architecture-common</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <parent>
         <groupId>com.saji.m2.parent</groupId>
         <artifactId>m2-commons-parent</artifactId>
-        <version>0.0.1</version>
+        <version>{"message":"Resource not accessible by integration","documentation_url":"https://docs.github.com/rest/packages/packages#list-package-versions-for-a-package-owned-by-a-user","status":"403"}</version>
     </parent>
     <distributionManagement>
         <repository>
