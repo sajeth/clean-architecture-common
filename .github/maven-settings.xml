@@ -15,7 +15,7 @@
             <repositories>
                 <repository>
                     <id>github</id>
-                    <url>https://maven.pkg.github.com/sajeth/m2-commons-parent</url>
+                    <url>https://maven.pkg.github.com/sajeth/m2-java-parent</url>
                 </repository>
             </repositories>
         </profile>
