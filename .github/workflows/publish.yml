@@ -1,4 +1,4 @@
-name: Publish to GitHub Packages
+name: Publish
 
 on:
   push:
@@ -33,7 +33,7 @@ jobs:
           METADATA=$(curl -sf -u "sajeth:$GH_PACKAGES_TOKEN" "$METADATA_URL" || echo "")
 
           if [ -z "$METADATA" ]; then
-            echo "::error::Could not fetch $METADATA_URL — ensure m2-commons-parent is published from m2-java-parent and GH_PACKAGES_TOKEN secret has read:packages scope."
+            echo "::error::Could not fetch $METADATA_URL — Ensure m2-commons-parent is published from m2-java-parent and GH_PACKAGES_TOKEN secret has read:packages scope."
             exit 1
           fi
 
