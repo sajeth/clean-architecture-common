@@ -23,31 +23,21 @@ jobs:
           java-version: '25'
           distribution: 'temurin'
 
-      - name: Update parent to latest version
-        run: mvn --no-transfer-progress versions:update-parent -DallowSnapshots=false -DgenerateBackupPoms=false --settings .github/maven-settings.xml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: ${{ github.actor }}
-
-      - name: Bump patch version
+      - name: Update parent to latest and bump project version
         run: |
-          CURRENT=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout --settings .github/maven-settings.xml)
-          MAJOR=$(echo "$CURRENT" | cut -d. -f1)
-          MINOR=$(echo "$CURRENT" | cut -d. -f2)
-          PATCH=$(echo "$CURRENT" | cut -d. -f3)
-          NEW_VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))"
-          mvn --no-transfer-progress versions:set -DnewVersion="$NEW_VERSION" -DgenerateBackupPoms=false
-          echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_ENV"
+          LATEST_PARENT=$(gh api \
+            "/users/sajeth/packages/maven/com.saji.m2.parent.m2-commons-parent/versions" \
+            --jq '.[0].name' 2>/dev/null || echo "")
+          python3 .github/scripts/update_pom.py "$LATEST_PARENT"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: ${{ github.actor }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit version bump
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add pom.xml
-          git diff --cached --quiet || git commit -m "chore: bump version to ${{ env.NEW_VERSION }} [skip ci]"
+          git diff --cached --quiet || git commit -m "chore: bump version to $NEW_VERSION [skip ci]"
           git push
 
       - name: Deploy to GitHub Packages
