@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.saji.m2.commons</groupId>
     <artifactId>clean-architecture-common</artifactId>
-    <version>0.0.7</version>
+    <version>0.0.8</version>
     <parent>
         <groupId>com.saji.m2.parent</groupId>
         <artifactId>m2-commons-parent</artifactId>
