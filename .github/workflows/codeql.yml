@@ -1,0 +1,65 @@
+name: CodeQL
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize, reopened, ready_for_review]
+  schedule:
+    - cron: '25 3 * * 1'  # Weekly — Monday 03:25 UTC
+
+permissions: {}
+
+jobs:
+  gate:
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/dependabot-gate.yml
+    permissions:
+      pull-requests: read
+    with:
+      pr-number: ${{ github.event.pull_request.number }}
+
+  analyze:
+    needs: gate
+    if: always() && (needs.gate.result == 'success' || needs.gate.result == 'skipped')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [java-kotlin]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@dc73d59c2d7bd4f8194098a91219eeee6d8a1719  # v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: manual
+
+      - name: Set up Java
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654  # v5
+        with:
+          java-version: ${{ vars.JAVA_VERSION || '25' }}
+          distribution: 'temurin'
+          cache: 'maven'
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
+
+      - name: Build with Maven
+        run: mvn --no-transfer-progress compile -DskipTests --batch-mode
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@dc73d59c2d7bd4f8194098a91219eeee6d8a1719  # v4
+        with:
+          category: "/language:${{ matrix.language }}"

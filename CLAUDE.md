@@ -104,6 +104,7 @@ Inherited from `m2-commons-parent`: `spring-web`, `tools.jackson.core:jackson-da
 |---|---|---|
 | `publish.yml` | Push to `master` or manual | Sync parent version, bump semver, deploy + SBOM + SLSA |
 | `java-analysis.yml` | PRs | SpotBugs, PMD, Checkstyle, JaCoCo, Semgrep SAST |
+| `codeql.yml` | PRs, push to `master`, weekly | CodeQL static analysis for Java |
 | `dependency-review.yml` | PRs | Blocks high-severity dependency changes |
 | `dependency-submission.yml` | PRs | Submits Maven dependency graph to GitHub Security |
 | `dependabot-auto-merge.yml` | Dependabot PRs | Auto-approve + squash-merge after checks pass |

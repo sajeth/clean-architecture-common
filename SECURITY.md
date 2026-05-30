@@ -57,6 +57,7 @@ This repository uses automated tooling on every pull request and release:
 | Tool | Purpose |
 |------|---------|
 | **Semgrep** (`p/java`, `p/owasp-top-ten`) | SAST scan of Java source and CI configuration |
+| **CodeQL** | Semantic analysis for Java; results uploaded to GitHub Code Scanning |
 | **Dependency Review** | Blocks PRs that introduce high-severity dependency changes |
 | **SpotBugs / PMD / Checkstyle** | Static analysis for code quality and common bug patterns |
 | **Dependabot** | Keeps GitHub Actions and Maven dependencies current |
