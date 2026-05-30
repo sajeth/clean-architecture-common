@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+    rebase-strategy: auto
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "ci"
+
+  - package-ecosystem: maven
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+    rebase-strategy: auto
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: "fix"
+    labels:
+      - "security"

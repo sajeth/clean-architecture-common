@@ -2,17 +2,47 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.saji.m2.commons</groupId>
-    <artifactId>clean-architecture-common</artifactId>
-    <version>0.0.8</version>
     <parent>
-        <groupId>com.saji.m2.parent</groupId>
+        <groupId>io.github.sajeth</groupId>
         <artifactId>m2-commons-parent</artifactId>
-        <version>0.0.9</version>
+        <version>0.0.1</version>
         <relativePath/>
     </parent>
-    <properties>
-    </properties>
+
+    <groupId>io.github.sajeth</groupId>
+    <artifactId>clean-architecture-common</artifactId>
+    <version>0.0.1</version>
+    <name>clean-architecture-common</name>
+    <description>Shared clean architecture building blocks: ports, CQRS, exception handling, and persistence adapters.</description>
+    <url>https://github.com/sajeth/clean-architecture-common</url>
+
+    <scm>
+        <connection>scm:git:git://github.com/sajeth/clean-architecture-common.git</connection>
+        <developerConnection>scm:git:ssh://github.com/sajeth/clean-architecture-common.git</developerConnection>
+        <url>https://github.com/sajeth/clean-architecture-common</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/sajeth/clean-architecture-common</url>
+        </repository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/sajeth/m2-java-parent</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.data</groupId>

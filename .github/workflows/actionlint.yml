@@ -1,0 +1,37 @@
+name: Lint Workflows
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/**'
+
+permissions: {}
+
+jobs:
+  gate:
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/dependabot-gate.yml
+    permissions:
+      pull-requests: read
+    with:
+      pr-number: ${{ github.event.pull_request.number }}
+
+  actionlint:
+    needs: gate
+    if: always() && (needs.gate.result == 'success' || needs.gate.result == 'skipped')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
+
+      - name: Run actionlint
+        uses: raven-actions/actionlint@205b530c5d9fa8f44ae9ed59f341a0db994aa6f8  # v2
+        with:
+          files: '.github/workflows/*.yml'
