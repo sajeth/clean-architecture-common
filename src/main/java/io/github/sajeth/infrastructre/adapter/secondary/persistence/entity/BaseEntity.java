@@ -1,7 +1,9 @@
 package io.github.sajeth.infrastructre.adapter.secondary.persistence.entity;
 
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.Column;
 
@@ -13,8 +15,6 @@ import java.util.regex.Pattern;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
-@Getter
 public abstract class BaseEntity {
 
     @Id

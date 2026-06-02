@@ -78,17 +78,17 @@
         </dependency>
     </dependencies>
 
-<!--    <build>-->
-<!--        <pluginManagement>-->
-<!--            <plugins>-->
-<!--                &lt;!&ndash; Upgrade maven-pmd-plugin to a release after Java 25 GA (Sep 2025)-->
-<!--                     so that targetJdk=25 is accepted. Parent ships 3.26.0 which predates it. &ndash;&gt;-->
-<!--                <plugin>-->
-<!--                    <groupId>org.apache.maven.plugins</groupId>-->
-<!--                    <artifactId>maven-pmd-plugin</artifactId>-->
-<!--                    <version>3.28.0</version>-->
-<!--                </plugin>-->
-<!--            </plugins>-->
-<!--        </pluginManagement>-->
-<!--    </build>-->
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Upgrade maven-pmd-plugin to a release after Java 25 GA (Sep 2025)
+                     so that targetJdk=25 is accepted. Parent ships 3.26.0 which predates it. -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-pmd-plugin</artifactId>
+                    <version>3.28.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>
