@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>clean-architecture-common</artifactId>
-    <version>0.0.2</version>
+    <version>2026.6.1</version>
     <name>clean-architecture-common</name>
     <description>Shared clean architecture building blocks: ports, CQRS, exception handling, and persistence adapters.</description>
     <url>https://github.com/sajeth/clean-architecture-common</url>
