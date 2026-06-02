@@ -31,3 +31,6 @@ jobs:
           fail-on-severity: high
           comment-summary-in-pr: always
           retry-on-snapshot-warnings: true
+          # GHSA-88m4-h43f-wx84: PMD's own GPG release-key passphrase exposed in the
+          # Maven Central artifact — build-time analysis tool only, no runtime impact.
+          allow-ghsas: GHSA-88m4-h43f-wx84
