@@ -83,7 +83,7 @@ jobs:
           fi
 
       - name: Deploy to GitHub Packages
-        run: mvn --no-transfer-progress deploy -DskipTests --batch-mode
+        run: mvn --no-transfer-progress deploy -DskipTests --batch-mode -Djava.version=${{ vars.JAVA_VERSION || '25' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
@@ -91,7 +91,7 @@ jobs:
       - name: Generate CycloneDX SBOM
         run: |
           mvn --no-transfer-progress org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom \
-            -DskipTests --batch-mode
+            -DskipTests --batch-mode -Djava.version=${{ vars.JAVA_VERSION || '25' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
