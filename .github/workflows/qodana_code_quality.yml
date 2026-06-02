@@ -35,9 +35,6 @@ jobs:
 
       - name: Qodana Scan
         uses: JetBrains/qodana-action@d7b5ec2fbec32197ef447c450e00589ed5f34fd5  # v2026.1
-        env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           pr-mode: false
           use-caches: true

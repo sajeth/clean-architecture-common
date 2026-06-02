@@ -1,6 +1,8 @@
 name: Dependency Submission
 
 on:
+  push:
+    branches: [master]
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -8,6 +10,7 @@ permissions: {}
 
 jobs:
   gate:
+    if: github.event_name == 'pull_request'
     uses: ./.github/workflows/dependabot-gate.yml
     permissions:
       pull-requests: read
@@ -15,7 +18,8 @@ jobs:
       pr-number: ${{ github.event.pull_request.number }}
 
   submit:
-    needs: gate
+    if: always() && (github.event_name == 'push' || needs.gate.result == 'success')
+    needs: [gate]
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -67,11 +67,23 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add pom.xml
-          git diff --cached --quiet || git commit -m "chore: bump version to $NEW_VERSION [skip ci]"
-          git push
+          if git diff --cached --quiet; then
+            echo "No pom.xml changes to commit."
+          else
+            BRANCH="chore/bump-version-to-${NEW_VERSION}"
+            git checkout -b "$BRANCH"
+            git commit -m "chore: bump version to ${NEW_VERSION} [skip ci]"
+            git push -u origin "$BRANCH"
+            gh pr create \
+              --title "chore: bump version to ${NEW_VERSION} [skip ci]" \
+              --body "Automated version bump: parent \`${LATEST_PARENT}\`, project \`${NEW_VERSION}\`." \
+              --base master \
+              --head "$BRANCH" || true
+            gh pr merge "$BRANCH" --auto --squash || true
+          fi
 
       - name: Deploy to GitHub Packages
-        run: mvn --no-transfer-progress deploy -DskipTests --batch-mode
+        run: mvn --no-transfer-progress deploy -DskipTests --batch-mode -Djava.version=${{ vars.JAVA_VERSION || '25' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
@@ -79,7 +91,7 @@ jobs:
       - name: Generate CycloneDX SBOM
         run: |
           mvn --no-transfer-progress org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom \
-            -DskipTests --batch-mode
+            -DskipTests --batch-mode -Djava.version=${{ vars.JAVA_VERSION || '25' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}

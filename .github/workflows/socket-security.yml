@@ -73,6 +73,10 @@ jobs:
           GH_PR_NUMBER: ${{ github.event.pull_request.number || 0 }}
           GH_ISSUE_NUMBER: ${{ github.event.issue.number || 0 }}
         run: |
+          if [ -z "$SOCKET_SECURITY_API_KEY" ]; then
+            echo "SOCKET_SECURITY_API_KEY secret not configured — skipping scan."
+            exit 0
+          fi
           PR_NUMBER=0
           if [[ "$GH_EVENT_NAME" == "pull_request" ]]; then
             PR_NUMBER=$GH_PR_NUMBER

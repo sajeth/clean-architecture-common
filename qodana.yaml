@@ -1,0 +1,10 @@
+version: "1.0"
+linter: jetbrains/qodana-jvm-community
+
+profile:
+  name: qodana.recommended
+
+exclude:
+  - name: All
+    paths:
+      - target.nosync
