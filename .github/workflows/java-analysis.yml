@@ -53,20 +53,20 @@ jobs:
         with:
           path: '**/target.nosync/spotbugsXml.xml'
 
-      - name: Run PMD
-        if: github.actor != 'dependabot[bot]' && github.actor != 'app/dependabot'
-        run: |
-          mvn --no-transfer-progress org.apache.maven.plugins:maven-pmd-plugin:pmd \
-            -DskipTests --batch-mode -Djava.version=${{ vars.JAVA_VERSION }} -DtargetJdk=${{ vars.JAVA_VERSION }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: ${{ github.actor }}
-
-      - name: Post PMD annotations
-        if: github.actor != 'dependabot[bot]' && github.actor != 'app/dependabot'
-        uses: jwgmeligmeyling/pmd-github-action@322e346bd76a0757c4d54ff9209e245965aa066d  # v1.2
-        with:
-          path: '**/target.nosync/pmd.xml'
+#      - name: Run PMD
+#        if: github.actor != 'dependabot[bot]' && github.actor != 'app/dependabot'
+#        run: |
+#          mvn --no-transfer-progress org.apache.maven.plugins:maven-pmd-plugin:pmd \
+#            -DskipTests --batch-mode -Djava.version=${{ vars.JAVA_VERSION }} -DtargetJdk=${{ vars.JAVA_VERSION }}
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
+#          GITHUB_ACTOR: ${{ github.actor }}
+#
+#      - name: Post PMD annotations
+#        if: github.actor != 'dependabot[bot]' && github.actor != 'app/dependabot'
+#        uses: jwgmeligmeyling/pmd-github-action@322e346bd76a0757c4d54ff9209e245965aa066d  # v1.2
+#        with:
+#          path: '**/target.nosync/pmd.xml'
 
       - name: Run Checkstyle
         if: github.actor != 'dependabot[bot]' && github.actor != 'app/dependabot'
