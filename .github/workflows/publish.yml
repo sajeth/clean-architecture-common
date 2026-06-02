@@ -25,7 +25,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654  # v5
         with:
-          java-version: ${{ vars.JAVA_VERSION || '25' }}
+          java-version: ${{ vars.JAVA_VERSION }}
           distribution: 'temurin'
           cache: 'maven'
           server-id: github
@@ -83,7 +83,7 @@ jobs:
           fi
 
       - name: Deploy to GitHub Packages
-        run: mvn --no-transfer-progress deploy -DskipTests --batch-mode -Djava.version=${{ vars.JAVA_VERSION || '25' }}
+        run: mvn --no-transfer-progress deploy -DskipTests --batch-mode -Djava.version=${{ vars.JAVA_VERSION }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
@@ -91,7 +91,7 @@ jobs:
       - name: Generate CycloneDX SBOM
         run: |
           mvn --no-transfer-progress org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom \
-            -DskipTests --batch-mode -Djava.version=${{ vars.JAVA_VERSION || '25' }}
+            -DskipTests --batch-mode -Djava.version=${{ vars.JAVA_VERSION }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
