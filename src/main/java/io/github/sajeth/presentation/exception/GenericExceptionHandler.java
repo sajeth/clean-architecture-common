@@ -181,7 +181,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
                 .timestamp(OffsetDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error("Bad Request")
-                .message(ex.getMessage())
+                .message("Invalid request argument")
                 .path(exchange.getRequest().getPath().value())
                 .build();
 
@@ -204,7 +204,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
                 .timestamp(OffsetDateTime.now())
                 .status(HttpStatus.CONFLICT.value())
                 .error("Conflict")
-                .message(ex.getMessage())
+                .message("A conflict occurred processing this request")
                 .path(exchange.getRequest().getPath().value())
                 .build();
 
@@ -227,7 +227,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
                 .timestamp(OffsetDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error("Internal Server Error")
-                .message(ex.getMessage())
+                .message("An unexpected error occurred")
                 .path(exchange.getRequest().getPath().value())
                 .build();
 
