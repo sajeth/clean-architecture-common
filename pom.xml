@@ -81,18 +81,12 @@
     <build>
         <pluginManagement>
             <plugins>
-                <!-- maven-pmd-plugin rejects targetJdk values it does not recognise at the
-                     plugin level, independently of the JDK used to compile the project.
-                     Pin targetJdk to 21 (highest version accepted by the inherited plugin)
-                     so PMD can still analyse the source while the build targets Java 25.
-                     Remove this override once a version of maven-pmd-plugin that accepts
-                     targetJdk=25 is available in the parent POM. -->
+                <!-- Upgrade maven-pmd-plugin to a release after Java 25 GA (Sep 2025)
+                     so that targetJdk=25 is accepted. Parent ships 3.26.0 which predates it. -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <configuration>
-                        <targetJdk>21</targetJdk>
-                    </configuration>
+                    <version>3.28.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
