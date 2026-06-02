@@ -57,7 +57,7 @@ jobs:
         if: github.actor != 'dependabot[bot]' && github.actor != 'app/dependabot'
         run: |
           mvn --no-transfer-progress org.apache.maven.plugins:maven-pmd-plugin:pmd \
-            -DskipTests --batch-mode -Djava.version=${{ vars.JAVA_VERSION || '25' }} -DtargetJdk=${{ vars.JAVA_VERSION || '25' }}
+            -DskipTests --batch-mode -Djava.version=${{ vars.JAVA_VERSION || '25' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
