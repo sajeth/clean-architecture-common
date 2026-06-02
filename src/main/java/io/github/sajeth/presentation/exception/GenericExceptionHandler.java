@@ -262,7 +262,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
      * Build exception detail from a single throwable
      */
     protected ExceptionDetail buildExceptionDetail(Throwable throwable) {
-        List<ExceptionDetail.StackTraceInfo> stackTraceInfo = Arrays.stream(throwable.getStackTrace())
+        var stackTraceInfo = Arrays.stream(throwable.getStackTrace())
                 .limit(stackTraceMaxDepth)
                 .map(ExceptionDetail.StackTraceInfo::from)
                 .toList();
