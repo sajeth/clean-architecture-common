@@ -10,11 +10,6 @@
 
     <artifactId>clean-architecture-common</artifactId>
     <version>0.0.2</version>
-
-    <properties>
-        <!-- PMD 7.7.0 does not support Java 25; pin to 21 until a compatible version is inherited -->
-        <targetJdk>21</targetJdk>
-    </properties>
     <name>clean-architecture-common</name>
     <description>Shared clean architecture building blocks: ports, CQRS, exception handling, and persistence adapters.</description>
     <url>https://github.com/sajeth/clean-architecture-common</url>
