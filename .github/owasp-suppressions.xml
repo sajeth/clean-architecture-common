@@ -13,7 +13,7 @@
     -->
     <suppress>
         <notes>GHSA-88m4-h43f-wx84: GPG key passphrase in PMD artifact — build-time tool only, no runtime impact</notes>
-        <gav regex="true">^net\.sourceforge\.pmd:pmd-(core|java):.*$</gav>
+        <gav regex="true">^net\.sourceforge\.pmd:pmd-(core|java|compat6):.*$</gav>
         <vulnerabilityName>GHSA-88m4-h43f-wx84</vulnerabilityName>
     </suppress>
 </suppressions>
