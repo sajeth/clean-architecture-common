@@ -1,0 +1,43 @@
+name: OpenSSF Scorecard
+
+on:
+  push:
+    branches: [master]
+  schedule:
+    - cron: '0 3 * * 1'  # every Monday 03:00 UTC
+
+permissions: {}
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      id-token: write   # required to publish results to OpenSSF API
+      actions: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
+        with:
+          persist-credentials: false
+
+      - name: Run Scorecard
+        id: scorecard
+        uses: ossf/scorecard-action@05b42c624433fc40578a4040d5cf5e36ddca8cde  # v2.4.2
+        with:
+          results_file: scorecard.sarif
+          results_format: sarif
+          # publish_results requires OIDC to api.securityscorecards.dev; disabled because
+          # that external call was causing the job to fail when the API was unreachable.
+          # SARIF is still uploaded to GitHub Security below.
+          publish_results: false
+        continue-on-error: true  # don't fail the job if scorecard itself errors
+
+      - name: Upload Scorecard results to GitHub Security
+        if: always()  # upload even if scorecard step errored, as long as SARIF exists
+        uses: github/codeql-action/upload-sarif@dc73d59c2d7bd4f8194098a91219eeee6d8a1719  # v4
+        with:
+          sarif_file: scorecard.sarif
+          category: scorecard

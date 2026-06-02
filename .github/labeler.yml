@@ -1,0 +1,18 @@
+# Maps changed file paths to PR labels.
+
+ci:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/workflows/**'
+      - '.github/dependabot.yml'
+
+dependency:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/pom.xml'
+
+security:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/owasp-suppressions.xml'
+      - 'SECURITY.md'

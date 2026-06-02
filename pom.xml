@@ -5,11 +5,9 @@
     <parent>
         <groupId>io.github.sajeth</groupId>
         <artifactId>m2-commons-parent</artifactId>
-        <version>0.0.1</version>
-        <relativePath/>
+        <version>2026.6.1</version>
     </parent>
 
-    <groupId>io.github.sajeth</groupId>
     <artifactId>clean-architecture-common</artifactId>
     <version>0.0.1</version>
     <name>clean-architecture-common</name>
