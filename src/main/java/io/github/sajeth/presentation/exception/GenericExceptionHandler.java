@@ -140,6 +140,31 @@ public class GenericExceptionHandler extends LoggerAdapter {
     }
 
     /**
+     * Handle authorization exceptions
+     */
+    @ExceptionHandler(AuthorizationException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handleAuthorizationException(
+            AuthorizationException ex,
+            ServerWebExchange exchange) {
+
+        warn(MessageFormat.format("Authorization failed: code={0}, permission={1}, message={2}",
+                ex.getErrorCode(), ex.getRequiredPermission(), ex.getMessage()));
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(OffsetDateTime.now())
+                .status(HttpStatus.FORBIDDEN.value())
+                .error("Access Denied")
+                .message(ex.getMessage())
+                .path(exchange.getRequest().getPath().value())
+                .errorCode(ex.getErrorCode())
+                .build();
+
+        addExceptionDetails(errorResponse, ex);
+
+        return Mono.just(ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse));
+    }
+
+    /**
      * Handle external service exceptions
      */
     @ExceptionHandler(ExternalServiceException.class)
