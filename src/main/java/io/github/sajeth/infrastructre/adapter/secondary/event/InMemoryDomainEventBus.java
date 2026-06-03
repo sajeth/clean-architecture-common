@@ -28,8 +28,11 @@ public class InMemoryDomainEventBus extends LoggerAdapter implements DomainEvent
     @Override
     @SuppressWarnings("unchecked")
     public Mono<Void> publish(DomainEvent event) {
-        List<DomainEventHandler<?>> eventHandlers = handlers.getOrDefault(event.getClass(), List.of());
-        debug(MessageFormat.format("Publishing event {0} to {1} handler(s)", event.getClass().getSimpleName(), eventHandlers.size()));
+        List<DomainEventHandler<?>> eventHandlers =
+                handlers.getOrDefault(event.getClass(), List.of());
+        debug(MessageFormat.format(
+                "Publishing event {0} to {1} handler(s)",
+                event.getClass().getSimpleName(), eventHandlers.size()));
         return Flux.fromIterable(eventHandlers)
                 .flatMap(handler -> ((DomainEventHandler<DomainEvent>) handler).handle(event))
                 .then();

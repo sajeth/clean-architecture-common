@@ -1,9 +1,13 @@
 package io.github.sajeth.framework.event;
 
-import lombok.Getter;
 import java.time.Instant;
 import java.util.UUID;
 
+import lombok.Getter;
+
+/**
+ * Abstract base for all domain events.
+ */
 @Getter
 public abstract class DomainEvent {
     private final String eventId;
