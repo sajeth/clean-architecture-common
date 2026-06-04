@@ -1,9 +1,16 @@
 package io.github.sajeth.presentation.exception;
 
-import io.github.sajeth.framework.exception.*;
+import io.github.sajeth.framework.exception.AuthenticationException;
+import io.github.sajeth.framework.exception.BusinessException;
+import io.github.sajeth.framework.exception.ExternalServiceException;
+import io.github.sajeth.framework.exception.ResourceNotFoundException;
+import io.github.sajeth.framework.exception.ValidationException;
 import io.github.sajeth.infrastructre.adapter.secondary.logging.LoggerAdapter;
 import io.github.sajeth.presentation.dto.ExceptionDetail;
 import io.github.sajeth.presentation.dto.ProblemDetailErrorResponse;
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -15,16 +22,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.List;
-
+/**
+ * WebFlux {@link RestControllerAdvice} that maps domain exceptions to RFC 9457 Problem Detail responses.
+ */
 @RestControllerAdvice
 @Order(-1)
 @SuppressWarnings("unused")
 public class ProblemDetailExceptionHandler extends LoggerAdapter {
 
-    private static final MediaType PROBLEM_JSON = MediaType.parseMediaType("application/problem+json");
+    private static final MediaType PROBLEM_JSON =
+            MediaType.parseMediaType("application/problem+json");
 
     @Value("${app.error.include-stacktrace:false}")
     private boolean includeStackTrace;
@@ -32,10 +39,18 @@ public class ProblemDetailExceptionHandler extends LoggerAdapter {
     @Value("${app.error.stacktrace-max-depth:10}")
     private int stackTraceMaxDepth;
 
+    /** Constructs a new handler and initialises the underlying logger. */
     public ProblemDetailExceptionHandler() {
         super(ProblemDetailExceptionHandler.class);
     }
 
+    /**
+     * Handles {@link ResourceNotFoundException} and returns a 404 Problem Detail response.
+     *
+     * @param ex       the exception
+     * @param exchange the current server exchange
+     * @return a {@code Mono} wrapping the response entity
+     */
     @ExceptionHandler(ResourceNotFoundException.class)
     public Mono<ResponseEntity<ProblemDetail>> handleResourceNotFoundException(
             ResourceNotFoundException ex, ServerWebExchange exchange) {
@@ -44,61 +59,106 @@ public class ProblemDetailExceptionHandler extends LoggerAdapter {
                 HttpStatus.NOT_FOUND.value(), "Not Found", ex.getMessage(), "not-found");
         body.setInstance(exchange.getRequest().getURI());
         addDetails(body, ex);
-        return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(PROBLEM_JSON).body(body));
+        return Mono.just(
+                ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(PROBLEM_JSON).body(body));
     }
 
+    /**
+     * Handles {@link ValidationException} and returns a 400 Problem Detail response.
+     *
+     * @param ex       the exception
+     * @param exchange the current server exchange
+     * @return a {@code Mono} wrapping the response entity
+     */
     @ExceptionHandler(ValidationException.class)
     public Mono<ResponseEntity<ProblemDetail>> handleValidationException(
             ValidationException ex, ServerWebExchange exchange) {
         warn(MessageFormat.format("Validation failed: {0}", ex.getMessage()));
         ProblemDetailErrorResponse body = ProblemDetailErrorResponse.of(
-                HttpStatus.BAD_REQUEST.value(), "Validation Failed", ex.getMessage(), "validation-error");
+                HttpStatus.BAD_REQUEST.value(), "Validation Failed",
+                ex.getMessage(), "validation-error");
         body.setInstance(exchange.getRequest().getURI());
         body.setValidationErrors(ex.getErrors().values().stream().toList());
         addDetails(body, ex);
-        return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(PROBLEM_JSON).body(body));
+        return Mono.just(
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(PROBLEM_JSON).body(body));
     }
 
+    /**
+     * Handles {@link BusinessException} and returns a 422 Problem Detail response.
+     *
+     * @param ex       the exception
+     * @param exchange the current server exchange
+     * @return a {@code Mono} wrapping the response entity
+     */
     @ExceptionHandler(BusinessException.class)
     public Mono<ResponseEntity<ProblemDetail>> handleBusinessException(
             BusinessException ex, ServerWebExchange exchange) {
         warn(MessageFormat.format("Business rule violation: code={0}", ex.getErrorCode()));
         ProblemDetailErrorResponse body = ProblemDetailErrorResponse.of(
-                HttpStatus.UNPROCESSABLE_ENTITY.value(), "Business Rule Violation", ex.getMessage(), "business-error");
+                HttpStatus.UNPROCESSABLE_ENTITY.value(), "Business Rule Violation",
+                ex.getMessage(), "business-error");
         body.setInstance(exchange.getRequest().getURI());
         body.setErrorCode(ex.getErrorCode());
         addDetails(body, ex);
-        return Mono.just(ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).contentType(PROBLEM_JSON).body(body));
+        return Mono.just(ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .contentType(PROBLEM_JSON).body(body));
     }
 
+    /**
+     * Handles {@link AuthenticationException} and returns a 401 Problem Detail response.
+     *
+     * @param ex       the exception
+     * @param exchange the current server exchange
+     * @return a {@code Mono} wrapping the response entity
+     */
     @ExceptionHandler(AuthenticationException.class)
     public Mono<ResponseEntity<ProblemDetail>> handleAuthenticationException(
             AuthenticationException ex, ServerWebExchange exchange) {
         error(MessageFormat.format("Authentication failed: code={0}", ex.getErrorCode()));
         ProblemDetailErrorResponse body = ProblemDetailErrorResponse.of(
-                HttpStatus.UNAUTHORIZED.value(), "Authentication Failed", ex.getMessage(), "authentication-error");
+                HttpStatus.UNAUTHORIZED.value(), "Authentication Failed",
+                ex.getMessage(), "authentication-error");
         body.setInstance(exchange.getRequest().getURI());
         body.setErrorCode(ex.getErrorCode());
         addDetails(body, ex);
-        return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).contentType(PROBLEM_JSON).body(body));
+        return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .contentType(PROBLEM_JSON).body(body));
     }
 
+    /**
+     * Handles {@link ExternalServiceException} and returns a 502 or 503 Problem Detail response.
+     *
+     * @param ex       the exception
+     * @param exchange the current server exchange
+     * @return a {@code Mono} wrapping the response entity
+     */
     @ExceptionHandler(ExternalServiceException.class)
     public Mono<ResponseEntity<ProblemDetail>> handleExternalServiceException(
             ExternalServiceException ex, ServerWebExchange exchange) {
-        error(MessageFormat.format("External service error: service={0}, retryable={1}", ex.getServiceName(), ex.isRetryable()));
+        error(MessageFormat.format("External service error: service={0}, retryable={1}",
+                ex.getServiceName(), ex.isRetryable()));
         HttpStatus status = ex.isRetryable() ? HttpStatus.SERVICE_UNAVAILABLE : HttpStatus.BAD_GATEWAY;
         ProblemDetailErrorResponse body = ProblemDetailErrorResponse.of(
                 status.value(), "External Service Error",
-                MessageFormat.format("Service {0} failed: {1}", ex.getServiceName(), ex.getMessage()),
+                MessageFormat.format("Service {0} failed: {1}",
+                        ex.getServiceName(), ex.getMessage()),
                 "external-service-error");
         body.setInstance(exchange.getRequest().getURI());
         body.setErrorCode(ex.getErrorCode());
-        body.setDebugInfo(ex.isRetryable() ? "This error is retryable" : "This error is not retryable");
+        body.setDebugInfo(
+                ex.isRetryable() ? "This error is retryable" : "This error is not retryable");
         addDetails(body, ex);
         return Mono.just(ResponseEntity.status(status).contentType(PROBLEM_JSON).body(body));
     }
 
+    /**
+     * Handles any unhandled {@link Exception} and returns a 500 Problem Detail response.
+     *
+     * @param ex       the exception
+     * @param exchange the current server exchange
+     * @return a {@code Mono} wrapping the response entity
+     */
     @ExceptionHandler(Exception.class)
     public Mono<ResponseEntity<ProblemDetail>> handleGenericException(
             Exception ex, ServerWebExchange exchange) {
@@ -108,11 +168,14 @@ public class ProblemDetailExceptionHandler extends LoggerAdapter {
                 "An unexpected error occurred", "internal-error");
         body.setInstance(exchange.getRequest().getURI());
         addDetails(body, ex);
-        return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(PROBLEM_JSON).body(body));
+        return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(PROBLEM_JSON).body(body));
     }
 
     private void addDetails(ProblemDetailErrorResponse body, Throwable ex) {
-        if (!includeStackTrace) return;
+        if (!includeStackTrace) {
+            return;
+        }
         List<ExceptionDetail> details = buildExceptionDetails(ex);
         body.setExceptions(details);
     }
