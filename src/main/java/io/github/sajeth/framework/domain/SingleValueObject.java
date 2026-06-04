@@ -2,6 +2,11 @@ package io.github.sajeth.framework.domain;
 
 import java.util.List;
 
+/**
+ * Base class for value objects that wrap a single typed value.
+ *
+ * @param <T> the type of the wrapped value
+ */
 public abstract class SingleValueObject<T> extends ValueObject {
     private final T value;
 
