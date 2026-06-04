@@ -15,10 +15,18 @@ import reactor.core.publisher.Mono;
 public interface AuthorizerInputPort<T> {
     Mono<Boolean> isAuthorized(T resource, String principal);
 
+    /**
+     * Requires authorization for the given resource and principal, throwing on denial.
+     *
+     * @param resource  the resource being accessed
+     * @param principal the principal requesting access
+     * @return a {@code Mono} emitting the resource, or an error if access is denied
+     */
     default Mono<T> requireAuthorization(T resource, String principal) {
         return isAuthorized(resource, principal)
                 .flatMap(authorized -> authorized
                         ? Mono.just(resource)
-                        : Mono.error(new AuthorizationException("Access denied for principal: " + principal)));
+                        : Mono.error(new AuthorizationException(
+                                "Access denied for principal: " + principal)));
     }
 }
