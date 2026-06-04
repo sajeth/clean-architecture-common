@@ -20,8 +20,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Global exception handler for all REST controllers
- * Handles exceptions from all layers and converts them to standardized error responses
+ * Global exception handler for all REST controllers.
+ * Handles exceptions from all layers and converts them to standardized error responses.
  *
  * @author sajethperli
  */
@@ -42,7 +42,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
 
 
     /**
-     * Handle resource not found exceptions
+     * Handle resource not found exceptions.
      */
     @ExceptionHandler(ResourceNotFoundException.class)
     public Mono<ResponseEntity<ErrorResponse>> handleResourceNotFoundException(
@@ -66,7 +66,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
     }
 
     /**
-     * Handle validation exceptions
+     * Handle validation exceptions.
      */
     @ExceptionHandler(ValidationException.class)
     public Mono<ResponseEntity<ErrorResponse>> handleValidationException(
@@ -90,7 +90,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
     }
 
     /**
-     * Handle business exceptions
+     * Handle business exceptions.
      */
     @ExceptionHandler(BusinessException.class)
     public Mono<ResponseEntity<ErrorResponse>> handleBusinessException(
@@ -115,7 +115,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
     }
 
     /**
-     * Handle authentication exceptions
+     * Handle authentication exceptions.
      */
     @ExceptionHandler(AuthenticationException.class)
     public Mono<ResponseEntity<ErrorResponse>> handleAuthenticationException(
@@ -140,26 +140,55 @@ public class GenericExceptionHandler extends LoggerAdapter {
     }
 
     /**
-     * Handle external service exceptions
+     * Handle authorization exceptions.
+     */
+    @ExceptionHandler(AuthorizationException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handleAuthorizationException(
+            AuthorizationException ex,
+            ServerWebExchange exchange) {
+
+        warn(MessageFormat.format("Authorization failed: code={0}, permission={1}, message={2}",
+                ex.getErrorCode(), ex.getRequiredPermission(), ex.getMessage()));
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(OffsetDateTime.now())
+                .status(HttpStatus.FORBIDDEN.value())
+                .error("Access Denied")
+                .message(ex.getMessage())
+                .path(exchange.getRequest().getPath().value())
+                .errorCode(ex.getErrorCode())
+                .build();
+
+        addExceptionDetails(errorResponse, ex);
+
+        return Mono.just(ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse));
+    }
+
+    /**
+     * Handle external service exceptions.
      */
     @ExceptionHandler(ExternalServiceException.class)
     public Mono<ResponseEntity<ErrorResponse>> handleExternalServiceException(
             ExternalServiceException ex,
             ServerWebExchange exchange) {
 
-        error(MessageFormat.format("External service error: service={0}, code={1}, retryable={2}, message={3}",
+        error(MessageFormat.format(
+                "External service error: service={0}, code={1}, retryable={2}, message={3}",
                 ex.getServiceName(), ex.getErrorCode(), ex.isRetryable(), ex.getMessage()));
 
-        HttpStatus status = ex.isRetryable() ? HttpStatus.SERVICE_UNAVAILABLE : HttpStatus.BAD_GATEWAY;
+        HttpStatus status = ex.isRetryable()
+                ? HttpStatus.SERVICE_UNAVAILABLE : HttpStatus.BAD_GATEWAY;
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(OffsetDateTime.now())
                 .status(status.value())
                 .error("External Service Error")
-                .message(String.format("Service %s failed: %s", ex.getServiceName(), ex.getMessage()))
+                .message(String.format(
+                        "Service %s failed: %s", ex.getServiceName(), ex.getMessage()))
                 .path(exchange.getRequest().getPath().value())
                 .errorCode(ex.getErrorCode())
-                .debugInfo(ex.isRetryable() ? "This error is retryable" : "This error is not retryable")
+                .debugInfo(ex.isRetryable()
+                        ? "This error is retryable" : "This error is not retryable")
                 .build();
 
         addExceptionDetails(errorResponse, ex);
@@ -168,7 +197,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
     }
 
     /**
-     * Handle illegal argument exceptions
+     * Handle illegal argument exceptions.
      */
     @ExceptionHandler(IllegalArgumentException.class)
     public Mono<ResponseEntity<ErrorResponse>> handleIllegalArgumentException(
@@ -191,7 +220,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
     }
 
     /**
-     * Handle illegal state exceptions
+     * Handle illegal state exceptions.
      */
     @ExceptionHandler(IllegalStateException.class)
     public Mono<ResponseEntity<ErrorResponse>> handleIllegalStateException(
@@ -214,7 +243,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
     }
 
     /**
-     * Handle all other exceptions
+     * Handle all other exceptions.
      */
     @ExceptionHandler(Exception.class)
     public Mono<ResponseEntity<ErrorResponse>> handleGenericException(
@@ -233,14 +262,15 @@ public class GenericExceptionHandler extends LoggerAdapter {
 
         addExceptionDetails(errorResponse, ex);
 
-        return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse));
+        return Mono.just(ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse));
     }
 
 
 
     /**
-     * Build exception details list from throwable
-     * Includes the main exception and all causes in the chain
+     * Build exception details list from throwable.
+     * Includes the main exception and all causes in the chain.
      */
     protected List<ExceptionDetail> buildExceptionDetails(Throwable throwable) {
         if (!includeStackTrace) {
@@ -259,7 +289,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
     }
 
     /**
-     * Build exception detail from a single throwable
+     * Build exception detail from a single throwable.
      */
     protected ExceptionDetail buildExceptionDetail(Throwable throwable) {
         var stackTraceInfo = Arrays.stream(throwable.getStackTrace())
@@ -275,7 +305,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
     }
 
     /**
-     * Add exception details to error response if enabled
+     * Add exception details to error response if enabled.
      */
     protected void addExceptionDetails(ErrorResponse errorResponse, Throwable throwable) {
         if (includeStackTrace) {
