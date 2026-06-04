@@ -1,9 +1,12 @@
 package io.github.sajeth.framework.event;
 
-import lombok.Getter;
-
 import java.time.Instant;
 
+import lombok.Getter;
+
+/**
+ * Represents a domain event persisted in the transactional outbox.
+ */
 @Getter
 public class OutboxEvent {
     private final String id;
