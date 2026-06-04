@@ -1,15 +1,14 @@
 package io.github.sajeth.infrastructre.adapter.secondary.persistence.cqrs.query.core;
 
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import io.github.sajeth.infrastructre.adapter.secondary.logging.LoggerAdapter;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Query Bus - dispatches queries to their appropriate handlers.
@@ -22,11 +21,24 @@ public class QueryBus extends LoggerAdapter {
     private final Map<Class<?>, QueryHandler<?, ?>> handlers = new HashMap<>();
     private final Map<Class<?>, FluxQueryHandler<?, ?>> fluxHandlers = new HashMap<>();
 
+    /**
+     * Constructs a QueryBus with only single-result query handlers.
+     *
+     * @param queryHandlers the list of query handlers to register
+     */
     public QueryBus(List<QueryHandler<?, ?>> queryHandlers) {
         this(queryHandlers, List.of());
     }
 
-    public QueryBus(List<QueryHandler<?, ?>> queryHandlers, List<FluxQueryHandler<?, ?>> fluxQueryHandlers) {
+    /**
+     * Constructs a QueryBus with both single-result and streaming query handlers.
+     *
+     * @param queryHandlers     the list of single-result query handlers to register
+     * @param fluxQueryHandlers the list of streaming query handlers to register
+     */
+    public QueryBus(
+            List<QueryHandler<?, ?>> queryHandlers,
+            List<FluxQueryHandler<?, ?>> fluxQueryHandlers) {
         super(QueryBus.class);
         queryHandlers.forEach(handler -> {
             handlers.put(handler.getQueryType(), handler);
@@ -63,8 +75,9 @@ public class QueryBus extends LoggerAdapter {
 
         debug(MessageFormat.format("Dispatching query: {0}", query.getClass().getSimpleName()));
         return handler.handle(query)
-                .doOnSuccess(result -> debug(MessageFormat.format("Query {0} completed successfully",
-                        query.getClass().getSimpleName())))
+                .doOnSuccess(result -> debug(
+                        MessageFormat.format("Query {0} completed successfully",
+                                query.getClass().getSimpleName())))
                 .doOnError(error -> error(MessageFormat.format("Query {0} failed: {1}",
                         query.getClass().getSimpleName(), error.getMessage())));
     }
@@ -84,7 +97,8 @@ public class QueryBus extends LoggerAdapter {
             return Flux.error(new IllegalArgumentException(
                     "No flux handler registered for query: " + query.getClass().getSimpleName()));
         }
-        debug(MessageFormat.format("Dispatching flux query: {0}", query.getClass().getSimpleName()));
+        debug(MessageFormat.format(
+                "Dispatching flux query: {0}", query.getClass().getSimpleName()));
         return handler.handle(query)
                 .doOnComplete(() -> debug(MessageFormat.format("Flux query {0} completed",
                         query.getClass().getSimpleName())))
