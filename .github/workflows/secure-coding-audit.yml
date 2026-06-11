@@ -1,0 +1,206 @@
+name: Secure Coding Audit
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [master]
+  schedule:
+    - cron: '0 4 * * 2'  # Weekly — Tuesday 04:00 UTC
+
+permissions: {}
+
+jobs:
+  gate:
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/dependabot-gate.yml
+    permissions:
+      pull-requests: read
+    with:
+      pr-number: ${{ github.event.pull_request.number }}
+
+  owasp-dependency-check:
+    name: OWASP Dependency-Check (NVD)
+    needs: gate
+    if: always() && (needs.gate.result == 'success' || needs.gate.result == 'skipped')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
+      - name: Set up Java
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00  # v4
+        with:
+          java-version: ${{ vars.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
+      - name: Run OWASP Dependency-Check
+        run: |
+          mvn --no-transfer-progress org.owasp:dependency-check-maven:check \
+            -DskipTests \
+            -DfailBuildOnCVSS=11 \
+            -DsuppressionFiles=.github/owasp-suppressions.xml \
+            -Dformats=SARIF,HTML \
+            --batch-mode
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+        continue-on-error: true
+      - name: Upload OWASP SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@51f77a0f93b44a5c1e27db3d05c21c7be2db7de9  # v3
+        with:
+          sarif_file: target.nosync/dependency-check-report.sarif
+          category: owasp-dependency-check
+        continue-on-error: true
+
+  find-security-bugs:
+    name: Find Security Bugs (SpotBugs + FSB)
+    needs: gate
+    if: always() && (needs.gate.result == 'success' || needs.gate.result == 'skipped')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
+      - name: Set up Java
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00  # v4
+        with:
+          java-version: ${{ vars.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
+      - name: Run SpotBugs with Find Security Bugs plugin
+        run: |
+          mvn --no-transfer-progress compile \
+            com.github.spotbugs:spotbugs-maven-plugin:spotbugs \
+            -DskipTests \
+            -Dspotbugs.includeFilterFile=.github/spotbugs-security-include.xml \
+            -Dspotbugs.plugins=com.h3xstream.findsecbugs:findsecbugs-plugin:LATEST \
+            -Dspotbugs.effort=Max \
+            -Dspotbugs.threshold=Low \
+            --batch-mode
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+        continue-on-error: true
+      - name: Post SpotBugs FSB annotations
+        if: github.event_name == 'pull_request'
+        uses: jwgmeligmeyling/spotbugs-github-action@b8e2c3523acb34c87f14e18cbcd2d87db8c8584e  # v1.2
+        with:
+          path: '**/target.nosync/spotbugsXml.xml'
+        continue-on-error: true
+
+  gitleaks:
+    name: Gitleaks Secret Scan
+    needs: gate
+    if: always() && (needs.gate.result == 'success' || needs.gate.result == 'skipped')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
+        with:
+          fetch-depth: 0
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7  # v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+        continue-on-error: true
+
+  trivy:
+    name: Trivy Vulnerability Scan
+    needs: gate
+    if: always() && (needs.gate.result == 'success' || needs.gate.result == 'skipped')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
+      - name: Set up Java
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00  # v4
+        with:
+          java-version: ${{ vars.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
+      - name: Build for scanning
+        run: mvn --no-transfer-progress package -DskipTests --batch-mode
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+        continue-on-error: true
+      - name: Run Trivy filesystem scan
+        uses: aquasecurity/trivy-action@6c0e26e50f9697ad87bc53d7a01dc5a82fc4e294  # v0.29.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH,MEDIUM
+          exit-code: 0
+      - name: Upload Trivy SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@51f77a0f93b44a5c1e27db3d05c21c7be2db7de9  # v3
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy
+        continue-on-error: true
+
+  pmd-security:
+    name: PMD Security Rules
+    needs: gate
+    if: >
+      always() &&
+      (needs.gate.result == 'success' || needs.gate.result == 'skipped') &&
+      github.actor != 'dependabot[bot]' &&
+      github.actor != 'app/dependabot'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
+      - name: Set up Java
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00  # v4
+        with:
+          java-version: ${{ vars.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
+      - name: Run PMD
+        run: |
+          mvn --no-transfer-progress org.apache.maven.plugins:maven-pmd-plugin:pmd \
+            -DskipTests \
+            -Dpmd.rulesets=category/java/security.xml,category/java/errorprone.xml \
+            --batch-mode
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+        continue-on-error: true
+      - name: Post PMD annotations
+        if: github.event_name == 'pull_request'
+        uses: jwgmeligmeyling/pmd-github-action@322e346bd76a0757c4d54ff9209e245965aa066d  # v1.2
+        with:
+          path: '**/target.nosync/pmd.xml'
+        continue-on-error: true
