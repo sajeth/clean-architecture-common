@@ -22,10 +22,17 @@ public class QueryBus extends LoggerAdapter {
     public QueryBus(List<QueryHandler<?, ?>> queryHandlers) {
         super(QueryBus.class);
         queryHandlers.forEach(handler -> {
-            handlers.put(handler.getQueryType(), handler);
+            Class<?> queryType = handler.getQueryType();
+            if (handlers.containsKey(queryType)) {
+                throw new IllegalStateException(
+                    "Duplicate QueryHandler registered for type: " + queryType.getSimpleName() +
+                    ". Existing: " + handlers.get(queryType).getClass().getSimpleName() +
+                    ", Duplicate: " + handler.getClass().getSimpleName());
+            }
+            handlers.put(queryType, handler);
             debug(MessageFormat.format("Registered query handler: {0} for {1}",
                     handler.getClass().getSimpleName(),
-                    handler.getQueryType().getSimpleName()));
+                    queryType.getSimpleName()));
         });
         info(MessageFormat.format("QueryBus initialized with {0} handlers", handlers.size()));
     }
