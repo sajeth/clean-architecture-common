@@ -57,7 +57,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
             ServerWebExchange exchange) {
 
         warn(MessageFormat.format("Resource not found: type={0}, id={1}, message={2}",
-                ex.getResourceType(), ex.getResourceId(), ex.getMessage()));
+                sanitise(ex.getResourceType()), sanitise(ex.getResourceId()), sanitise(ex.getMessage())));
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(OffsetDateTime.now())
@@ -80,7 +80,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
             ValidationException ex,
             ServerWebExchange exchange) {
 
-        warn(MessageFormat.format("Validation failed: {0}, errors: {1}", ex.getMessage(), ex.getErrors()));
+        warn(MessageFormat.format("Validation failed: {0}, errors: {1}", sanitise(ex.getMessage()), sanitise(String.valueOf(ex.getErrors()))));
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(OffsetDateTime.now())
@@ -105,7 +105,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
             ServerWebExchange exchange) {
 
         warn(MessageFormat.format("Business exception occurred: code={0}, message={1}",
-                ex.getErrorCode(), ex.getMessage()));
+                sanitise(ex.getErrorCode()), sanitise(ex.getMessage())));
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(OffsetDateTime.now())
@@ -130,7 +130,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
             ServerWebExchange exchange) {
 
         error(MessageFormat.format("Authentication failed: code={0}, message={1}",
-                ex.getErrorCode(), ex.getMessage()));
+                sanitise(ex.getErrorCode()), sanitise(ex.getMessage())));
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(OffsetDateTime.now())
@@ -181,7 +181,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
 
         error(MessageFormat.format(
                 "External service error: service={0}, code={1}, retryable={2}, message={3}",
-                ex.getServiceName(), ex.getErrorCode(), ex.isRetryable(), ex.getMessage()));
+                sanitise(ex.getServiceName()), sanitise(ex.getErrorCode()), ex.isRetryable(), sanitise(ex.getMessage())));
 
         HttpStatus status = ex.isRetryable()
                 ? HttpStatus.SERVICE_UNAVAILABLE : HttpStatus.BAD_GATEWAY;
@@ -211,7 +211,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
             IllegalArgumentException ex,
             ServerWebExchange exchange) {
 
-        warn(MessageFormat.format("Invalid argument: {0}", ex.getMessage()));
+        warn(MessageFormat.format("Invalid argument: {0}", sanitise(ex.getMessage())));
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(OffsetDateTime.now())
@@ -234,7 +234,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
             IllegalStateException ex,
             ServerWebExchange exchange) {
 
-        error(MessageFormat.format("Illegal state: {0}", ex.getMessage()));
+        error(MessageFormat.format("Illegal state: {0}", sanitise(ex.getMessage())));
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(OffsetDateTime.now())
@@ -257,7 +257,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
             Exception ex,
             ServerWebExchange exchange) {
 
-        error(MessageFormat.format("Unexpected error occurred: {0}", ex.getMessage()));
+        error(MessageFormat.format("Unexpected error occurred: {0}", sanitise(ex.getMessage())));
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(OffsetDateTime.now())

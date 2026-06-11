@@ -37,4 +37,16 @@ public abstract class LoggerAdapter implements LoggerOutputPort {
         logger.severe(message);
         logger.throwing(LoggerAdapter.class.getName(), "error", throwable);
     }
+
+    /**
+     * Sanitise user-controlled input before including it in log messages.
+     * Strips CRLF sequences and null bytes to prevent CWE-117 log injection.
+     *
+     * @param input the string to sanitise; may be null
+     * @return sanitised string, or "(null)" if input was null
+     */
+    protected static String sanitise(String input) {
+        if (input == null) return "(null)";
+        return input.replaceAll("[\r\n\t\0]", " ").trim();
+    }
 }

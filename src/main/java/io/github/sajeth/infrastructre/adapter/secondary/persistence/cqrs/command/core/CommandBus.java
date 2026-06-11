@@ -58,7 +58,7 @@ public class CommandBus extends LoggerAdapter {
                 .doOnSuccess(result -> debug(MessageFormat.format("Command {0} completed successfully",
                         command.getClass().getSimpleName())))
                 .doOnError(error -> error(MessageFormat.format("Command {0} failed: {1}",
-                        command.getClass().getSimpleName(), error.getMessage())));
+                        command.getClass().getSimpleName(), sanitise(error.getMessage()))));
     }
 
     /**
