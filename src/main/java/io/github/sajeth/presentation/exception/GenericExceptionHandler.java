@@ -30,6 +30,13 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class GenericExceptionHandler extends LoggerAdapter {
 
+    /**
+     * SECURITY: This flag MUST remain false in production.
+     * Enabling it exposes internal exception messages in HTTP responses (CWE-209).
+     * Even when true, class names and file paths are stripped from the serialised
+     * stack trace to prevent package-structure disclosure — only method name and
+     * line number are included (see {@link #buildExceptionDetail(Throwable)}).
+     */
     @Value("${app.error.include-stacktrace:false}")
     private boolean includeStackTrace;
     @Value("${app.error.stacktrace-max-depth:10}")
@@ -259,12 +266,18 @@ public class GenericExceptionHandler extends LoggerAdapter {
     }
 
     /**
-     * Build exception detail from a single throwable
+     * Build exception detail from a single throwable.
+     * Class names, file names, and location strings are intentionally omitted from
+     * the serialised output to prevent internal package-structure disclosure (CWE-209).
+     * Only method name and line number are included for support correlation.
      */
     protected ExceptionDetail buildExceptionDetail(Throwable throwable) {
         var stackTraceInfo = Arrays.stream(throwable.getStackTrace())
                 .limit(stackTraceMaxDepth)
-                .map(ExceptionDetail.StackTraceInfo::from)
+                .map(element -> ExceptionDetail.StackTraceInfo.builder()
+                        .methodName(element.getMethodName())
+                        .lineNumber(element.getLineNumber())
+                        .build())
                 .toList();
 
         return ExceptionDetail.builder()
