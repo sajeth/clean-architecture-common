@@ -21,10 +21,17 @@ public class CommandBus extends LoggerAdapter {
     public CommandBus(List<CommandHandler<?, ?>> commandHandlers) {
         super(CommandBus.class);
         commandHandlers.forEach(handler -> {
-            handlers.put(handler.getCommandType(), handler);
+            Class<?> commandType = handler.getCommandType();
+            if (handlers.containsKey(commandType)) {
+                throw new IllegalStateException(
+                    "Duplicate CommandHandler registered for type: " + commandType.getSimpleName() +
+                    ". Existing: " + handlers.get(commandType).getClass().getSimpleName() +
+                    ", Duplicate: " + handler.getClass().getSimpleName());
+            }
+            handlers.put(commandType, handler);
             debug(MessageFormat.format("Registered command handler: {0} for {1}",
                     handler.getClass().getSimpleName(),
-                    handler.getCommandType().getSimpleName()));
+                    commandType.getSimpleName()));
         });
         info(MessageFormat.format("CommandBus initialized with {0} handlers", handlers.size()));
     }
@@ -51,7 +58,7 @@ public class CommandBus extends LoggerAdapter {
                 .doOnSuccess(result -> debug(MessageFormat.format("Command {0} completed successfully",
                         command.getClass().getSimpleName())))
                 .doOnError(error -> error(MessageFormat.format("Command {0} failed: {1}",
-                        command.getClass().getSimpleName(), error.getMessage())));
+                        command.getClass().getSimpleName(), sanitise(error.getMessage()))));
     }
 
     /**

@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.text.MessageFormat;
+
 /**
  * @author sajethperli
  */
@@ -19,7 +21,7 @@ public class ControllerExceptionHandler extends LoggerAdapter {
 
     @ExceptionHandler(ConversionFailedException.class)
     public ResponseEntity<String> handleConflict(ConversionFailedException ex) {
-        warn("Type conversion failed: " + ex.getMessage());
+        warn(MessageFormat.format("Type conversion failed: {0}", sanitise(ex.getMessage())));
         return new ResponseEntity<>("Invalid request parameter format", HttpStatus.BAD_REQUEST);
     }
 }

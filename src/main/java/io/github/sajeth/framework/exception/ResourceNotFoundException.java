@@ -13,13 +13,13 @@ public class ResourceNotFoundException extends RuntimeException {
     private final String resourceId;
 
     public ResourceNotFoundException(String resourceType, String resourceId) {
-        super(String.format("%s not found with id: %s", resourceType, resourceId));
+        super(resourceType + " not found");
         this.resourceType = resourceType;
         this.resourceId = resourceId;
     }
 
     public ResourceNotFoundException(String resourceType, String resourceId, Throwable cause) {
-        super(String.format("%s not found with id: %s", resourceType, resourceId), cause);
+        super(resourceType + " not found", cause);
         this.resourceType = resourceType;
         this.resourceId = resourceId;
     }
