@@ -41,10 +41,17 @@ public class QueryBus extends LoggerAdapter {
             List<FluxQueryHandler<?, ?>> fluxQueryHandlers) {
         super(QueryBus.class);
         queryHandlers.forEach(handler -> {
-            handlers.put(handler.getQueryType(), handler);
+            Class<?> queryType = handler.getQueryType();
+            if (handlers.containsKey(queryType)) {
+                throw new IllegalStateException(
+                    "Duplicate QueryHandler registered for type: " + queryType.getSimpleName() +
+                    ". Existing: " + handlers.get(queryType).getClass().getSimpleName() +
+                    ", Duplicate: " + handler.getClass().getSimpleName());
+            }
+            handlers.put(queryType, handler);
             debug(MessageFormat.format("Registered query handler: {0} for {1}",
                     handler.getClass().getSimpleName(),
-                    handler.getQueryType().getSimpleName()));
+                    queryType.getSimpleName()));
         });
         fluxQueryHandlers.forEach(handler -> {
             fluxHandlers.put(handler.getQueryType(), handler);
