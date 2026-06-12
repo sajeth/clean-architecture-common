@@ -1,5 +1,6 @@
 package io.github.sajeth.annotation;
 
+
 import java.lang.annotation.*;
 
 /**
@@ -12,7 +13,6 @@ import java.lang.annotation.*;
  * {@link RetentionPolicy#RUNTIME} for what is purely a safety contract marker.
  *
  * <p>Expected sanitisation: the value has been passed through
- * {@link io.github.sajeth.infrastructre.adapter.secondary.logging.LoggerAdapter#sanitise(String)}
  * or an equivalent that strips {@code \r}, {@code \n}, {@code \t}, and null bytes.
  *
  * <p>Usage:
