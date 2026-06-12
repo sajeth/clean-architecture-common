@@ -2,8 +2,11 @@ package io.github.sajeth.infrastructre.adapter.secondary.persistence.entity;
 
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.Column;
 
@@ -12,9 +15,12 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "id")
+@ToString(exclude = {"modifiedBy", "createdBy"})
 public abstract class BaseEntity {
 
     @Id
@@ -45,6 +51,7 @@ public abstract class BaseEntity {
     @Column("created_date")
     private LocalDateTime createdDate;
 
+    private static final Pattern DIACRITICS_PATTERN = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
 
     /**
      * Generates a unique URL-friendly slug based on the entity's name and id.
@@ -61,8 +68,7 @@ public abstract class BaseEntity {
         String normalized = Normalizer.normalize(this.name, Normalizer.Form.NFD);
 
         // Remove diacritical marks (accents)
-        Pattern diacriticsPattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-        String withoutDiacritics = diacriticsPattern.matcher(normalized).replaceAll("");
+        String withoutDiacritics = DIACRITICS_PATTERN.matcher(normalized).replaceAll("");
 
         String base = withoutDiacritics
                 .toLowerCase()
