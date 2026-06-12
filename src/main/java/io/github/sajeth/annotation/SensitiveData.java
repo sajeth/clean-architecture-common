@@ -1,6 +1,11 @@
 package io.github.sajeth.annotation;
 
-import java.lang.annotation.*;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Marks a field, parameter, or return value as sensitive data that must not
@@ -38,9 +43,9 @@ import java.lang.annotation.*;
 @Documented
 public @interface SensitiveData {
 
-    /**
-     * The sensitivity classification of this data.
-     * Used by tooling to apply appropriate masking or access controls.
-     */
-    SensitivityLevel value();
+  /**
+   * The sensitivity classification of this data.
+   * Used by tooling to apply appropriate masking or access controls.
+   */
+  SensitivityLevel value();
 }
