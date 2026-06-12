@@ -86,7 +86,7 @@ public class QueryBus extends LoggerAdapter {
                         MessageFormat.format("Query {0} completed successfully",
                                 query.getClass().getSimpleName())))
                 .doOnError(error -> error(MessageFormat.format("Query {0} failed: {1}",
-                        query.getClass().getSimpleName(), error.getMessage())));
+                        query.getClass().getSimpleName(), sanitise(error.getMessage()))));
     }
 
     /**
