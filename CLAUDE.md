@@ -111,6 +111,12 @@ Inherited from `m2-commons-parent`: `spring-web`, `tools.jackson.core:jackson-da
 | `dependabot-gate.yml` | Called by other workflows | Serializes Dependabot PRs |
 | `actionlint.yml` | Workflow file changes | Lints GitHub Actions YAML |
 
+## Code Style
+
+**No wildcard imports** — always use explicit, fully-qualified single-type imports. Never write `import foo.bar.*`.
+
+This is enforced in `.idea/codeStyles/Project.xml` (IntelliJ threshold set to 999) and must be followed in all new and modified Java files.
+
 ## Static Analysis Configuration
 
 All tools are configured to **not fail the build** (`failOnError=false`, `failOnViolation=false`) — they run in advisory mode and post annotations on PRs via GitHub Actions:
