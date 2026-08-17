@@ -24,19 +24,22 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6
         with:
           fetch-depth: 0
 
       - name: Set up Java
         uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654  # v5
         with:
-          java-version: ${{ vars.JAVA_VERSION }}
+          java-version: ${{ vars.JAVA_VERSION || '25' }}
           distribution: 'temurin'
           cache: 'maven'
           server-id: github
           server-username: GITHUB_ACTOR
           server-password: GITHUB_TOKEN
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
 
       - name: Run SpotBugs
         if: github.actor != 'dependabot[bot]' && github.actor != 'app/dependabot'
@@ -92,17 +95,20 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6
 
       - name: Set up Java
         uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654  # v5
         with:
-          java-version: ${{ vars.JAVA_VERSION }}
+          java-version: ${{ vars.JAVA_VERSION || '25' }}
           distribution: 'temurin'
           cache: 'maven'
           server-id: github
           server-username: GITHUB_ACTOR
           server-password: GITHUB_TOKEN
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
 
       - name: Run tests and generate coverage
         if: github.actor != 'dependabot[bot]' && github.actor != 'app/dependabot'
@@ -142,7 +148,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6
 
       - name: Run Semgrep
         run: |
