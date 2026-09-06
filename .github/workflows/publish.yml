@@ -54,42 +54,8 @@ jobs:
       - name: Sync parent to latest m2-commons-parent
         env:
           GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        run: |
-          METADATA_URL="https://maven.pkg.github.com/sajeth/m2-java-parent/io/github/sajeth/m2-commons-parent/maven-metadata.xml"
-          METADATA=$(curl -sf -u "${GITHUB_ACTOR}:${GH_PACKAGES_TOKEN}" "$METADATA_URL" || echo "")
-
-          if [ -z "$METADATA" ]; then
-            echo "::warning::Could not fetch $METADATA_URL — continuing with current parent version."
-            exit 0
-          fi
-
-          LATEST_PARENT=$(echo "$METADATA" | grep -oP '(?<=<release>)[^<]+' | head -1)
-          if [ -z "$LATEST_PARENT" ]; then
-            LATEST_PARENT=$(echo "$METADATA" | grep -oP '(?<=<latest>)[^<]+' | head -1)
-          fi
-
-          if [ -z "$LATEST_PARENT" ]; then
-            echo "::warning::Fetched maven-metadata.xml but could not parse a version — continuing with current parent."
-            exit 0
-          fi
-
-          python3 - "$LATEST_PARENT" <<'EOF'
-          import re, sys
-          latest = sys.argv[1]
-          content = open('pom.xml').read()
-          current = re.search(r'<parent>[\s\S]*?<version>([^<]+)</version>', content)
-          current = current.group(1) if current else ''
-          if current == latest:
-              print(f"m2-commons-parent already at {latest}")
-          else:
-              updated = re.sub(
-                  r'(<parent>[\s\S]*?<version>)([^<]+)(</version>[\s\S]*?</parent>)',
-                  lambda m: m.group(1) + latest + m.group(3),
-                  content,
-              )
-              open('pom.xml', 'w').write(updated)
-              print(f"m2-commons-parent updated: {current} → {latest}")
-          EOF
+          GITHUB_ACTOR: ${{ github.repository_owner }}
+        run: bash ./sync-parent.sh --apply
 
       - name: Set version
         env:

@@ -1,0 +1,90 @@
+name: Sync m2-commons-parent
+
+# Maven cannot use LATEST for parent POMs. This workflow keeps the pinned
+# <parent><version> on the newest GitHub Packages release and auto-merges it.
+
+on:
+  schedule:
+    - cron: '0 7 * * *'  # daily 07:00 UTC (after typical parent publishes)
+  workflow_dispatch:
+  repository_dispatch:
+    types: [m2-commons-parent-published]
+
+permissions: {}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6
+
+      - name: Set up Java
+        uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c  # v5
+        with:
+          java-version: ${{ vars.JAVA_VERSION || '25' }}
+          distribution: 'temurin'
+          cache: 'maven'
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.repository_owner }}
+
+      - name: Sync parent to latest
+        id: sync
+        env:
+          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.repository_owner }}
+          DISPATCH_VERSION: ${{ github.event.client_payload.version }}
+        run: |
+          if [ -n "${DISPATCH_VERSION:-}" ]; then
+            echo "repository_dispatch requested parent $DISPATCH_VERSION"
+          fi
+          before=$(python3 -c 'import re; print(re.search(r"<parent>[\s\S]*?<version>([^<]+)</version>", open("pom.xml").read()).group(1))')
+          bash ./sync-parent.sh --apply
+          after=$(python3 -c 'import re; print(re.search(r"<parent>[\s\S]*?<version>([^<]+)</version>", open("pom.xml").read()).group(1))')
+          if [ "$before" = "$after" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "version=$after" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "version=$after" >> "$GITHUB_OUTPUT"
+            echo "from=$before" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create PR
+        if: steps.sync.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FROM: ${{ steps.sync.outputs.from }}
+          TO: ${{ steps.sync.outputs.version }}
+        run: |
+          BRANCH="chore/sync-m2-commons-parent-${TO}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add pom.xml
+          git commit -m "fix(deps): bump m2-commons-parent from ${FROM} to ${TO}"
+          git push -u origin "$BRANCH"
+          printf '%s\n' \
+            "## Sync m2-commons-parent" \
+            "" \
+            "Auto-bumped \`io.github.sajeth:m2-commons-parent\` \`${FROM}\` → \`${TO}\` from GitHub Packages." \
+            "" \
+            "Maven cannot resolve parent POMs with \`LATEST\`/\`RELEASE\`; this workflow keeps the pin current." \
+            "" \
+            "This PR will auto-merge once required checks pass." \
+            > /tmp/pr-body.md
+          gh pr create \
+            --title "fix(deps): bump m2-commons-parent to ${TO}" \
+            --label "dependencies" \
+            --body-file /tmp/pr-body.md \
+            --base master \
+            --head "$BRANCH"
+          gh pr merge "$BRANCH" --auto --squash --delete-branch
