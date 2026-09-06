@@ -83,10 +83,9 @@ Inherited from `m2-commons-parent`: `spring-web`, `tools.jackson.core:jackson-da
 
 ## Versioning
 
-- **Development version in source:** `0.0.1`
-- **Published versions:** semver patch bump (`0.0.N`) on each push to `master`
-- The `publish.yml` workflow resolves the latest `m2-commons-parent` from GitHub Packages, updates the parent version in `pom.xml`, bumps the project version via `.github/scripts/update_pom.py`, deploys, creates a GitHub Release with the SBOM, and generates a SLSA provenance attestation
-
+- **Published versions:** CalVer (`YYYY.M.1` on the 1st, `YYYY.M.2` on the 15th), matching `m2-java-parent`
+- `publish.yml` runs on that schedule (and via `workflow_dispatch` / `release-on-merge`); syncs `m2-commons-parent` from GitHub Packages, sets the CalVer project version, deploys, creates a GitHub Release with the SBOM, and generates a SLSA provenance attestation
+- Ad-hoc releases: merge a PR labelled `release` to trigger `release-on-merge.yml` → `publish.yml`
 ## Security Conventions
 
 **When adding or updating a dependency:**
