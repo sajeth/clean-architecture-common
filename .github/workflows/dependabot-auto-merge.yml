@@ -9,23 +9,23 @@ permissions: {}
 
 jobs:
   auto-merge:
-    runs-on: ubuntu-latest
     if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
     permissions:
       pull-requests: write
+      contents: write
     steps:
-      - name: Approve PR (Dependabot only)
-        if: github.actor == 'dependabot[bot]' || github.actor == 'app/dependabot'
+      - name: Enable auto-merge (Dependabot only)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_URL: ${{ github.event.pull_request.html_url }}
-        run: gh pr review --approve "$PR_URL"
-
-      - name: Enable auto-merge
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_URL: ${{ github.event.pull_request.html_url }}
+          ACTOR: ${{ github.actor }}
         run: |
+          if [ "$ACTOR" != 'dependabot[bot]' ] && [ "$ACTOR" != 'app/dependabot' ]; then
+            echo "Skipping auto-merge for actor=$ACTOR (Dependabot only)."
+            exit 0
+          fi
+          # GITHUB_TOKEN cannot approve PRs; only enable auto-merge.
           gh pr merge --auto --squash "$PR_URL" \
             && echo "Auto-merge enabled." \
             || echo "Auto-merge not available (repo setting disabled or already set); merge manually when checks pass."
