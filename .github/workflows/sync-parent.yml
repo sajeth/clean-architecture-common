@@ -50,12 +50,16 @@ jobs:
           bash ./sync-parent.sh --apply
           after=$(python3 -c 'import re; print(re.search(r"<parent>[\s\S]*?<version>([^<]+)</version>", open("pom.xml").read()).group(1))')
           if [ "$before" = "$after" ]; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "version=$after" >> "$GITHUB_OUTPUT"
+            {
+              echo "changed=false"
+              echo "version=$after"
+            } >> "$GITHUB_OUTPUT"
           else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "version=$after" >> "$GITHUB_OUTPUT"
-            echo "from=$before" >> "$GITHUB_OUTPUT"
+            {
+              echo "changed=true"
+              echo "version=$after"
+              echo "from=$before"
+            } >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create PR
