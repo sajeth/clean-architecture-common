@@ -2,6 +2,16 @@ version: 2
 # Autonomous Dependabot maintenance for clean-architecture-common.
 # Security updates always raise PRs; version updates are grouped weekly.
 # Auto-merge + branch delete: .github/workflows/dependabot-auto-merge.yml
+#
+# Private parent (m2-commons-parent) lives on GitHub Packages — Dependabot needs
+# the registry below plus Dependabot secret GH_PACKAGES_TOKEN (read:packages).
+registries:
+  github-maven:
+    type: maven-repository
+    url: https://maven.pkg.github.com/sajeth/*
+    username: sajeth
+    password: ${{secrets.GH_PACKAGES_TOKEN}}
+
 updates:
   - package-ecosystem: github-actions
     directory: /
@@ -23,6 +33,8 @@ updates:
 
   - package-ecosystem: maven
     directory: /
+    registries:
+      - github-maven
     schedule:
       interval: weekly
       day: monday
@@ -34,6 +46,11 @@ updates:
     labels:
       - "dependencies"
     groups:
+      # All CalVer bumps of the private parent (incl. "major" year/month digits).
+      m2-commons-parent:
+        applies-to: version-updates
+        patterns:
+          - "io.github.sajeth:m2-commons-parent"
       maven-security:
         applies-to: security-updates
         patterns:
@@ -45,3 +62,5 @@ updates:
           - "patch"
         patterns:
           - "*"
+        exclude-patterns:
+          - "io.github.sajeth:m2-commons-parent"
