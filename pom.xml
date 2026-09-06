@@ -5,12 +5,12 @@
     <parent>
         <groupId>io.github.sajeth</groupId>
         <artifactId>m2-commons-parent</artifactId>
-        <version>2026.9.1</version>
+        <version>LATEST</version>
         <relativePath/>
     </parent>
 
     <artifactId>clean-architecture-common</artifactId>
-    <version>2026.6.2</version>
+    <version>0.0.1</version>
     <name>clean-architecture-common</name>
     <description>Shared clean architecture building blocks: ports, CQRS, exception handling, and persistence adapters.</description>
     <url>https://github.com/sajeth/clean-architecture-common</url>
@@ -43,16 +43,7 @@
     </repositories>
 
     <properties>
-        <!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-relational -->
-        <!-- GHSA-88fw-v6x4-3f58 / CVE-2026-41695: spring-data-commons <= 4.0.5 -->
-        <spring.data.relational>4.0.6</spring.data.relational>
-        <!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-jpa -->
-        <spring.data.jpa>4.0.6</spring.data.jpa>
-        <!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-commons -->
-        <spring.data.commons>4.0.6</spring.data.commons>
-        <!-- Override until m2-commons-parent publishes SpotBugs 4.10.x (Java 25 bytecode) -->
-        <!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-maven-plugin -->
-        <spotbugs.plugin.version>4.10.4.1</spotbugs.plugin.version>
+
     </properties>
 
     <dependencyManagement>

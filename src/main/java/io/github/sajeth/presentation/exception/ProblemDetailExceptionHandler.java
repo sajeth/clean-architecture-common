@@ -1,16 +1,9 @@
 package io.github.sajeth.presentation.exception;
 
-import io.github.sajeth.framework.exception.AuthenticationException;
-import io.github.sajeth.framework.exception.BusinessException;
-import io.github.sajeth.framework.exception.ExternalServiceException;
-import io.github.sajeth.framework.exception.ResourceNotFoundException;
-import io.github.sajeth.framework.exception.ValidationException;
+import io.github.sajeth.framework.exception.*;
 import io.github.sajeth.infrastructre.adapter.secondary.logging.LoggerAdapter;
 import io.github.sajeth.presentation.dto.ExceptionDetail;
 import io.github.sajeth.presentation.dto.ProblemDetailErrorResponse;
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -21,6 +14,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * WebFlux {@code @RestControllerAdvice} that maps domain exceptions to RFC 9457 Problem Detail responses.
@@ -39,7 +36,9 @@ public class ProblemDetailExceptionHandler extends LoggerAdapter {
     @Value("${app.error.stacktrace-max-depth:10}")
     private int stackTraceMaxDepth;
 
-    /** Constructs a new handler and initialises the underlying logger. */
+    /**
+     * Constructs a new handler and initialises the underlying logger.
+     */
     public ProblemDetailExceptionHandler() {
         super(ProblemDetailExceptionHandler.class);
     }

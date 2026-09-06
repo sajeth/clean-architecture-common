@@ -27,6 +27,6 @@ public interface AuthorizerInputPort<T> {
                 .flatMap(authorized -> authorized
                         ? Mono.just(resource)
                         : Mono.error(new AuthorizationException(
-                                "Access denied for principal: " + principal)));
+                        "Access denied for principal: " + principal)));
     }
 }
