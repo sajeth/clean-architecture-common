@@ -23,7 +23,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 /**
- * WebFlux {@link RestControllerAdvice} that maps domain exceptions to RFC 9457 Problem Detail responses.
+ * WebFlux {@code @RestControllerAdvice} that maps domain exceptions to RFC 9457 Problem Detail responses.
  */
 @RestControllerAdvice
 @Order(-1)
