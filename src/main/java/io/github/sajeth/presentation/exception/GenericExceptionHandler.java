@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 
 import java.text.MessageFormat;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -47,7 +48,6 @@ public class GenericExceptionHandler extends LoggerAdapter {
     }
 
 
-
     /**
      * Handle resource not found exceptions.
      */
@@ -60,7 +60,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
                 sanitise(ex.getResourceType()), sanitise(ex.getResourceId()), sanitise(ex.getMessage())));
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(OffsetDateTime.now())
+                .timestamp(timestamp())
                 .status(HttpStatus.NOT_FOUND.value())
                 .error("Not Found")
                 .message(ex.getMessage())
@@ -83,7 +83,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
         warn(MessageFormat.format("Validation failed: {0}, errors: {1}", sanitise(ex.getMessage()), sanitise(String.valueOf(ex.getErrors()))));
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(OffsetDateTime.now())
+                .timestamp(timestamp())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error("Validation Failed")
                 .message(ex.getMessage())
@@ -108,7 +108,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
                 sanitise(ex.getErrorCode()), sanitise(ex.getMessage())));
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(OffsetDateTime.now())
+                .timestamp(timestamp())
                 .status(HttpStatus.UNPROCESSABLE_CONTENT.value())
                 .error("Business Rule Violation")
                 .message(ex.getMessage())
@@ -133,7 +133,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
                 sanitise(ex.getErrorCode()), sanitise(ex.getMessage())));
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(OffsetDateTime.now())
+                .timestamp(timestamp())
                 .status(HttpStatus.UNAUTHORIZED.value())
                 .error("Authentication Failed")
                 .message(ex.getMessage())
@@ -158,7 +158,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
                 ex.getErrorCode(), ex.getRequiredPermission(), ex.getMessage()));
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(OffsetDateTime.now())
+                .timestamp(timestamp())
                 .status(HttpStatus.FORBIDDEN.value())
                 .error("Access Denied")
                 .message(ex.getMessage())
@@ -187,7 +187,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
                 ? HttpStatus.SERVICE_UNAVAILABLE : HttpStatus.BAD_GATEWAY;
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(OffsetDateTime.now())
+                .timestamp(timestamp())
                 .status(status.value())
                 .error("External Service Error")
                 .message(String.format(
@@ -214,7 +214,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
         warn(MessageFormat.format("Invalid argument: {0}", sanitise(ex.getMessage())));
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(OffsetDateTime.now())
+                .timestamp(timestamp())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error("Bad Request")
                 .message("Invalid request argument")
@@ -237,7 +237,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
         error(MessageFormat.format("Illegal state: {0}", sanitise(ex.getMessage())));
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(OffsetDateTime.now())
+                .timestamp(timestamp())
                 .status(HttpStatus.CONFLICT.value())
                 .error("Conflict")
                 .message("A conflict occurred processing this request")
@@ -260,7 +260,7 @@ public class GenericExceptionHandler extends LoggerAdapter {
         error(MessageFormat.format("Unexpected error occurred: {0}", sanitise(ex.getMessage())));
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(OffsetDateTime.now())
+                .timestamp(timestamp())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error("Internal Server Error")
                 .message("An unexpected error occurred")
@@ -272,7 +272,6 @@ public class GenericExceptionHandler extends LoggerAdapter {
         return Mono.just(ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse));
     }
-
 
 
     /**
@@ -325,5 +324,10 @@ public class GenericExceptionHandler extends LoggerAdapter {
             List<ExceptionDetail> details = buildExceptionDetails(throwable);
             errorResponse.setExceptions(details);
         }
+    }
+
+    /** UTC timestamp for error responses (avoids system-default zone). */
+    private static OffsetDateTime timestamp() {
+        return OffsetDateTime.now(ZoneOffset.UTC);
     }
 }

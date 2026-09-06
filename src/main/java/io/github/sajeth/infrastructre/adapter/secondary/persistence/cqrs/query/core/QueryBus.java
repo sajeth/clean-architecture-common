@@ -1,14 +1,14 @@
 package io.github.sajeth.infrastructre.adapter.secondary.persistence.cqrs.query.core;
 
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import io.github.sajeth.infrastructre.adapter.secondary.logging.LoggerAdapter;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Query Bus - dispatches queries to their appropriate handlers.
@@ -44,9 +44,9 @@ public class QueryBus extends LoggerAdapter {
             Class<?> queryType = handler.getQueryType();
             if (handlers.containsKey(queryType)) {
                 throw new IllegalStateException(
-                    "Duplicate QueryHandler registered for type: " + queryType.getSimpleName() +
-                    ". Existing: " + handlers.get(queryType).getClass().getSimpleName() +
-                    ", Duplicate: " + handler.getClass().getSimpleName());
+                        "Duplicate QueryHandler registered for type: " + queryType.getSimpleName() +
+                                ". Existing: " + handlers.get(queryType).getClass().getSimpleName() +
+                                ", Duplicate: " + handler.getClass().getSimpleName());
             }
             handlers.put(queryType, handler);
             debug(MessageFormat.format("Registered query handler: {0} for {1}",

@@ -1,7 +1,8 @@
 package io.github.sajeth.application.port.output;
 
-import java.util.Map;
 import reactor.core.publisher.Mono;
+
+import java.util.Map;
 
 /**
  * Output port for distributed tracing of reactive operations.

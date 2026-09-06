@@ -1,12 +1,7 @@
 package io.github.sajeth.infrastructre.adapter.secondary.persistence.entity;
 
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.Column;
 
@@ -24,41 +19,33 @@ import java.util.regex.Pattern;
 @ToString(exclude = {"modifiedBy", "createdBy"})
 public abstract class BaseEntity {
 
+    private static final Pattern DIACRITICS_PATTERN = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
     @Id
     private UUID id;
-
     @Column("name")
     private String name;
-
     @Column("active")
     private Boolean active = true;
-
     @Version
     private Long version;
-
     @LastModifiedBy
     @Column("modified_by")
     private String modifiedBy;
-
     @LastModifiedDate
     @Column("modified_date")
     private LocalDateTime modifiedDate;
-
     @CreatedBy
     @Column("created_by")
     private String createdBy;
-
     @CreatedDate
     @Column("created_date")
     private LocalDateTime createdDate;
-
-    private static final Pattern DIACRITICS_PATTERN = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
 
     /**
      * Generates a unique URL-friendly slug based on the entity's name and id.
      *
      * @return a lowercase, hyphen-separated string with special characters removed,
-     *         suffixed with the entity's id to ensure uniqueness
+     * suffixed with the entity's id to ensure uniqueness
      */
     public String generateSlug() {
         if (this.name == null || this.name.isBlank()) {

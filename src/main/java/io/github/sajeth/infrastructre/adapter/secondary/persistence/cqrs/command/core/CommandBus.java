@@ -24,9 +24,9 @@ public class CommandBus extends LoggerAdapter {
             Class<?> commandType = handler.getCommandType();
             if (handlers.containsKey(commandType)) {
                 throw new IllegalStateException(
-                    "Duplicate CommandHandler registered for type: " + commandType.getSimpleName() +
-                    ". Existing: " + handlers.get(commandType).getClass().getSimpleName() +
-                    ", Duplicate: " + handler.getClass().getSimpleName());
+                        "Duplicate CommandHandler registered for type: " + commandType.getSimpleName() +
+                                ". Existing: " + handlers.get(commandType).getClass().getSimpleName() +
+                                ", Duplicate: " + handler.getClass().getSimpleName());
             }
             handlers.put(commandType, handler);
             debug(MessageFormat.format("Registered command handler: {0} for {1}",

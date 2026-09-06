@@ -25,17 +25,17 @@ public class ValidationException extends RuntimeException {
         this.errors = new HashMap<>(errors);
     }
 
+    public ValidationException(String field, String error) {
+        super("Validation failed for field: " + field);
+        this.errors = new HashMap<>();
+        this.errors.put(field, error);
+    }
+
     /**
      * Returns an unmodifiable view of the errors map to prevent external mutation of exception state.
      */
     public Map<String, String> getErrors() {
         return Collections.unmodifiableMap(errors);
-    }
-
-    public ValidationException(String field, String error) {
-        super("Validation failed for field: " + field);
-        this.errors = new HashMap<>();
-        this.errors.put(field, error);
     }
 
     /**
