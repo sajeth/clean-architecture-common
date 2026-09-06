@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -18,7 +20,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ExceptionDetail {
+public class ExceptionDetail implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * Exception class name
@@ -48,7 +53,10 @@ public class ExceptionDetail {
     @NoArgsConstructor
     @AllArgsConstructor
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public static class StackTraceInfo {
+    public static class StackTraceInfo implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
 
         /**
          * Class name where the exception occurred
@@ -90,4 +98,3 @@ public class ExceptionDetail {
         }
     }
 }
-

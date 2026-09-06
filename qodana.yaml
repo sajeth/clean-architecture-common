@@ -4,7 +4,12 @@ linter: jetbrains/qodana-jvm-community
 profile:
   name: qodana.recommended
 
+# Lombok-generated accessors are invisible when the parent POM / deps fail to resolve,
+# which produces false "Field can be local" / "Field may be final" hits. Those inspections
+# are disabled here; real unused-field issues are still caught by SpotBugs/IDEA UnusedDeclaration.
 exclude:
   - name: All
     paths:
       - target.nosync
+  - name: FieldCanBeLocal
+  - name: FieldMayBeFinal

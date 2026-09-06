@@ -2,10 +2,12 @@ package io.github.sajeth.presentation.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.ProblemDetail;
 
+import java.io.Serial;
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
@@ -13,9 +15,13 @@ import java.util.Map;
 
 @Getter
 @Setter
+@EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProblemDetailErrorResponse extends ProblemDetail {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private String errorCode;
     private Instant timestamp;

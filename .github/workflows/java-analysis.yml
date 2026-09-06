@@ -41,6 +41,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
 
+      - name: Require latest m2-commons-parent
+        if: github.actor != 'dependabot[bot]' && github.actor != 'app/dependabot'
+        run: bash ./sync-parent.sh --check
+        env:
+          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.repository_owner }}
+
       - name: Run SpotBugs
         if: github.actor != 'dependabot[bot]' && github.actor != 'app/dependabot'
         run: |
