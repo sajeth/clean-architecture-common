@@ -12,6 +12,7 @@ import org.springframework.data.relational.core.mapping.Column;
 
 import java.text.Normalizer;
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -71,7 +72,7 @@ public abstract class BaseEntity {
         String withoutDiacritics = DIACRITICS_PATTERN.matcher(normalized).replaceAll("");
 
         String base = withoutDiacritics
-                .toLowerCase()
+                .toLowerCase(Locale.ROOT)
                 .trim()
                 .replaceAll("[^a-z0-9\\s-]", "")  // Remove special characters except spaces and hyphens
                 .replaceAll("\\s+", "-")           // Replace spaces with hyphens
