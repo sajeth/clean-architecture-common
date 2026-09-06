@@ -1,5 +1,7 @@
 name: Auto-merge
 
+# Dependabot autonomy: squash-merge when checks pass and delete the head branch.
+
 on:
   pull_request:
     types: [opened, reopened, synchronize, closed]
@@ -12,8 +14,9 @@ jobs:
     if: github.event.action != 'closed'
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write
       contents: write
+      pull-requests: write
+      issues: write
     steps:
       - name: Enable auto-merge (Dependabot only)
         env:
@@ -25,14 +28,40 @@ jobs:
             echo "Skipping auto-merge for actor=$ACTOR (Dependabot only)."
             exit 0
           fi
-          # GITHUB_TOKEN cannot approve PRs; only enable auto-merge.
-          gh pr merge --auto --squash "$PR_URL" \
-            && echo "Auto-merge enabled." \
-            || echo "Auto-merge not available (repo setting disabled or already set); merge manually when checks pass."
+          gh pr merge --auto --squash --delete-branch "$PR_URL" \
+            && echo "Auto-merge enabled; branch will be deleted after merge." \
+            || echo "Auto-merge not available (repo setting disabled or already set)."
+
+  delete-branch:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Delete head branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+          REPO: ${{ github.repository }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+        run: |
+          if [ "$HEAD_REPO" != "$REPO" ]; then
+            echo "Head branch is from a fork ($HEAD_REPO) — skipping delete."
+            exit 0
+          fi
+          if [ "$BRANCH" = "master" ] || [ "$BRANCH" = "main" ]; then
+            echo "Refusing to delete protected branch '$BRANCH'."
+            exit 0
+          fi
+          if gh api -X DELETE "repos/${REPO}/git/refs/heads/${BRANCH}"; then
+            echo "Deleted branch '$BRANCH'."
+          else
+            echo "Branch '$BRANCH' already deleted or not found."
+          fi
 
   rebase-on-merge:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
     permissions:
       pull-requests: write
     steps:
@@ -43,5 +72,5 @@ jobs:
           gh pr list --state open --json number,author \
             --jq '.[] | select(.author.login == "dependabot[bot]" or .author.login == "app/dependabot") | .number' | \
           while read -r pr; do
-            gh pr comment "$pr" --body "@dependabot rebase"
+            gh pr comment "$pr" --body "@dependabot rebase" || true
           done

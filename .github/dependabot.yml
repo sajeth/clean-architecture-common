@@ -1,4 +1,7 @@
 version: 2
+# Autonomous Dependabot maintenance for clean-architecture-common.
+# Security updates always raise PRs; version updates are grouped weekly.
+# Auto-merge + branch delete: .github/workflows/dependabot-auto-merge.yml
 updates:
   - package-ecosystem: github-actions
     directory: /
@@ -7,10 +10,16 @@ updates:
       day: monday
       time: "06:00"
     rebase-strategy: auto
+    open-pull-requests-limit: 20
     commit-message:
       prefix: "ci"
     labels:
       - "ci"
+      - "dependencies"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
 
   - package-ecosystem: maven
     directory: /
@@ -19,8 +28,20 @@ updates:
       day: monday
       time: "06:00"
     rebase-strategy: auto
-    open-pull-requests-limit: 0
+    open-pull-requests-limit: 20
     commit-message:
       prefix: "fix"
     labels:
-      - "security"
+      - "dependencies"
+    groups:
+      maven-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+      maven-patch-minor:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
+        patterns:
+          - "*"
