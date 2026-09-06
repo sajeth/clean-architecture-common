@@ -20,6 +20,7 @@ jobs:
       packages: write
       id-token: write
       attestations: write
+      pull-requests: write
 
     steps:
       - name: Checkout
@@ -87,10 +88,6 @@ jobs:
           RELEASE_VERSION: ${{ steps.version.outputs.value }}
           RELEASE_SHA: ${{ github.sha }}
         run: |
-          if gh release view "v${RELEASE_VERSION}" >/dev/null 2>&1; then
-            echo "Release v${RELEASE_VERSION} already exists — skipping create."
-            exit 0
-          fi
           gh release create "v${RELEASE_VERSION}" \
             --title "v${RELEASE_VERSION}" \
             --generate-notes \
@@ -105,17 +102,27 @@ jobs:
             target.nosync/bom.json
             target.nosync/bom.xml
 
-      - name: Commit version bump
+      - name: Open PR for version bump
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_VERSION: ${{ steps.version.outputs.value }}
         run: |
+          BRANCH="ci/release-v${RELEASE_VERSION}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if git diff --cached --quiet; then
-            echo "No pom.xml changes to commit."
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No version-bump changes to commit."
             exit 0
           fi
+          git checkout -b "$BRANCH"
+          git add -A
           git commit -m "ci: release v${RELEASE_VERSION} [skip ci]"
-          git push
+          git push -u origin "$BRANCH"
+          gh pr create \
+            --title "ci: release v${RELEASE_VERSION}" \
+            --body "Version bump from the Publish to GitHub Packages workflow for \`v${RELEASE_VERSION}\`." \
+            --base master \
+            --head "$BRANCH" \
+          || echo "PR may already exist for $BRANCH"
+          gh pr merge "$BRANCH" --auto --squash --delete-branch \
+            || echo "Auto-merge not available; merge the release PR manually."
