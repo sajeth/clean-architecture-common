@@ -48,7 +48,7 @@ jobs:
           GITHUB_ACTOR: ${{ github.actor }}
 
       - name: Qodana Scan
-        uses: JetBrains/qodana-action@b588768b6e7e6da579e518bc584f79de0d243302  # v2026.1
+        uses: JetBrains/qodana-action@10be11607eb323a180e2b76b26c9c5cdceac3e77  # v2026.2.1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
