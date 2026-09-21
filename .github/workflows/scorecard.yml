@@ -37,7 +37,7 @@ jobs:
 
       - name: Upload Scorecard results to GitHub Security
         if: always()  # upload even if scorecard step errored, as long as SARIF exists
-        uses: github/codeql-action/upload-sarif@1cf8f518e1ad217271451b975391e639ea196e55  # v4
+        uses: github/codeql-action/upload-sarif@a7afe0a2d717fe23bf93c8d8239d4f43c4a40f02  # v4
         with:
           sarif_file: scorecard.sarif
           category: scorecard
