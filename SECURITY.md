@@ -60,9 +60,31 @@ This repository uses automated tooling on every pull request and release:
 | **CodeQL** | Semantic analysis for Java; results uploaded to GitHub Code Scanning |
 | **Dependency Review** | Blocks PRs that introduce high-severity dependency changes |
 | **SpotBugs / PMD / Checkstyle** | Static analysis for code quality and common bug patterns |
-| **Dependabot** | Keeps GitHub Actions and Maven dependencies current |
+| **Dependabot** | Fully autonomous: opens, auto-approves, and auto-merges Actions + Maven update PRs (no human review) |
+| **Weekly dependency upgrade** | Syncs `m2-commons-parent`, then bumps `<properties>` with `mvnrepository.com` links (minor/patch) and opens a PR |
+| **Weekly latest releases** | Same property-link scan, including major bumps |
 | **CycloneDX SBOM** | Software Bill of Materials attached to every release |
 | **SLSA provenance** | Build attestation generated on every publish |
+
+### Automated `<properties>` version updates
+
+Version properties that should be kept current **must** include an
+`mvnrepository.com` comment link above them:
+
+```xml
+<properties>
+    <!-- https://mvnrepository.com/artifact/org.example/lib -->
+    <example.version>1.2.3</example.version>
+</properties>
+```
+
+`.github/workflows/dependency-upgrade.yml` and `latest-releases.yml` run
+`.github/scripts/update-property-versions.py` after syncing `m2-commons-parent`.
+Parent versions continue to be managed by `sync-parent.sh` / Dependabot.
+
+`GH_PUSH_TOKEN` should be a PAT with `contents:write` and `pull-requests:write`
+so opened PRs can trigger CI. If missing/expired, workflows fall back to
+`GITHUB_TOKEN` (PR is still created; other workflows may not run on that PR).
 
 ## Security Principles
 

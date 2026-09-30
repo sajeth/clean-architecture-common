@@ -2,10 +2,10 @@ name: Cleanup Old Package Versions
 
 on:
   workflow_run:
-    workflows: [ "Publish" ]
+    workflows: [ "Publish to GitHub Packages" ]
     types: [ completed ]
   schedule:
-    - cron: '0 9 1,15 * *'  # 3 h after publish windows
+    - cron: '0 15 * * 1'  # Monday 15:00 UTC — 3 h after weekly publish
   workflow_dispatch:
     inputs:
       keep:

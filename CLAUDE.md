@@ -83,9 +83,10 @@ Inherited from `m2-commons-parent`: `spring-web`, `tools.jackson.core:jackson-da
 
 ## Versioning
 
-- **Published versions:** CalVer (`YYYY.M.1` on the 1st, `YYYY.M.2` on the 15th), matching `m2-java-parent`
-- `publish.yml` runs on that schedule (and via `workflow_dispatch` / `release-on-merge`); syncs `m2-commons-parent` from GitHub Packages, sets the CalVer project version, deploys, creates a GitHub Release with the SBOM, and generates a SLSA provenance attestation
+- **Published versions:** CalVer `YYYY.M.W` — weekly Monday publish; `W` = week-of-month (1–5), matching `m2-java-parent`
+- `publish.yml` runs every Monday 12:00 UTC (and via `workflow_dispatch` / `release-on-merge`); syncs `m2-commons-parent` from GitHub Packages, sets the CalVer project version, deploys, creates a GitHub Release with the SBOM, and generates a SLSA provenance attestation
 - Ad-hoc releases: merge a PR labelled `release` to trigger `release-on-merge.yml` → `publish.yml`
+- Dependency updates are fully autonomous via Dependabot (no human review / CODEOWNERS requests)
 ## Security Conventions
 
 **When adding or updating a dependency:**
@@ -101,7 +102,7 @@ Inherited from `m2-commons-parent`: `spring-web`, `tools.jackson.core:jackson-da
 
 | Workflow | Trigger | Purpose |
 |---|---|---|
-| `publish.yml` | Push to `master` or manual | Sync parent version, bump semver, deploy + SBOM + SLSA |
+| `publish.yml` | Weekly Monday schedule or manual | Sync parent version, CalVer bump, deploy + SBOM + SLSA |
 | `java-analysis.yml` | PRs | SpotBugs, PMD, Checkstyle, JaCoCo, Semgrep SAST |
 | `codeql.yml` | PRs, push to `master`, weekly | CodeQL static analysis for Java |
 | `dependency-review.yml` | PRs | Blocks high-severity dependency changes |
