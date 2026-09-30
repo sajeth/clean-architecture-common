@@ -5,12 +5,12 @@
     <parent>
         <groupId>io.github.sajeth</groupId>
         <artifactId>m2-commons-parent</artifactId>
-        <version>2026.9.2</version>
+        <version>RELEASE</version>
         <relativePath/>
     </parent>
 
     <artifactId>clean-architecture-common</artifactId>
-    <version>2026.9.2</version>
+    <version>0.0.1</version>
     <name>clean-architecture-common</name>
     <description>Shared clean architecture building blocks: ports, CQRS, exception handling, and persistence adapters.</description>
     <url>https://github.com/sajeth/clean-architecture-common</url>
