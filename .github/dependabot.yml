@@ -1,7 +1,7 @@
 version: 2
-# Autonomous Dependabot maintenance for clean-architecture-common.
-# Security updates always raise PRs; version updates are grouped weekly.
-# Auto-merge + branch delete: .github/workflows/dependabot-auto-merge.yml
+# Fully autonomous Dependabot maintenance for clean-architecture-common.
+# No reviewers/assignees — CODEOWNERS is empty so PRs are not blocked on humans.
+# Auto-approve + auto-merge: .github/workflows/dependabot-auto-merge.yml
 #
 # Private parent (m2-commons-parent) lives on GitHub Packages — Dependabot needs
 # the registry below plus Dependabot secret GH_PACKAGES_TOKEN (read:packages).
