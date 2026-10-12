@@ -52,10 +52,7 @@ jobs:
           server-username: GITHUB_ACTOR
           server-password: GITHUB_TOKEN
 
-      - name: Sync parent to latest m2-commons-parent
-        env:
-          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-          GITHUB_ACTOR: ${{ github.repository_owner }}
+      - name: Ensure m2-commons-parent is LATEST
         run: bash ./sync-parent.sh --apply
 
       - name: Set version
