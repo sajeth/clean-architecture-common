@@ -25,7 +25,7 @@ jobs:
 
       - name: Run Scorecard
         id: scorecard
-        uses: ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc  # v2.4.4
+        uses: ossf/scorecard-action@fa7117db83c52d787ae5a89f350999701505d78e  # v2.5.0
         with:
           results_file: scorecard.sarif
           results_format: sarif
@@ -37,7 +37,7 @@ jobs:
 
       - name: Upload Scorecard results to GitHub Security
         if: always()  # upload even if scorecard step errored, as long as SARIF exists
-        uses: github/codeql-action/upload-sarif@7b6a151fb55e03ce158c75249f8880ea01aabebf  # v4
+        uses: github/codeql-action/upload-sarif@3306ba4df796b6b5059316f3af8bdea1e2138c9b  # v4
         with:
           sarif_file: scorecard.sarif
           category: scorecard
