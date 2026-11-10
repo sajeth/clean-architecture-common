@@ -19,6 +19,12 @@ jobs:
       pull-requests: write
       issues: write
     steps:
+      - name: Checkout
+        if: github.actor == 'dependabot[bot]' || github.actor == 'app/dependabot'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
+        with:
+          persist-credentials: false
+
       - name: Approve and enable auto-merge (Dependabot only)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
